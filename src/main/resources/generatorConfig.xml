@@ -49,6 +49,8 @@
         <table schema="mall" tableName="mall_product" domainObjectName="Product" >
             <property name="useActualColumnNames" value="false"/>
             <generatedKey column="ID" sqlStatement="MySql" identity="true" />
+            <columnOverride column="sub_images" jdbcType="VARCHAR"/>
+            <columnOverride column="detail" jdbcType="VARCHAR"/>
         </table>
         <table schema="mall" tableName="mall_category" domainObjectName="Category" >
             <property name="useActualColumnNames" value="false"/>

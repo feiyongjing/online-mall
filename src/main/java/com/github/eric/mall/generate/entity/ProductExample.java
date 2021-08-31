@@ -436,6 +436,146 @@ public class ProductExample {
             return (Criteria) this;
         }
 
+        public Criteria andSubImagesIsNull() {
+            addCriterion("sub_images is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubImagesIsNotNull() {
+            addCriterion("sub_images is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubImagesEqualTo(String value) {
+            addCriterion("sub_images =", value, "subImages");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubImagesNotEqualTo(String value) {
+            addCriterion("sub_images <>", value, "subImages");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubImagesGreaterThan(String value) {
+            addCriterion("sub_images >", value, "subImages");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubImagesGreaterThanOrEqualTo(String value) {
+            addCriterion("sub_images >=", value, "subImages");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubImagesLessThan(String value) {
+            addCriterion("sub_images <", value, "subImages");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubImagesLessThanOrEqualTo(String value) {
+            addCriterion("sub_images <=", value, "subImages");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubImagesLike(String value) {
+            addCriterion("sub_images like", value, "subImages");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubImagesNotLike(String value) {
+            addCriterion("sub_images not like", value, "subImages");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubImagesIn(List<String> values) {
+            addCriterion("sub_images in", values, "subImages");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubImagesNotIn(List<String> values) {
+            addCriterion("sub_images not in", values, "subImages");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubImagesBetween(String value1, String value2) {
+            addCriterion("sub_images between", value1, value2, "subImages");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubImagesNotBetween(String value1, String value2) {
+            addCriterion("sub_images not between", value1, value2, "subImages");
+            return (Criteria) this;
+        }
+
+        public Criteria andDetailIsNull() {
+            addCriterion("detail is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDetailIsNotNull() {
+            addCriterion("detail is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDetailEqualTo(String value) {
+            addCriterion("detail =", value, "detail");
+            return (Criteria) this;
+        }
+
+        public Criteria andDetailNotEqualTo(String value) {
+            addCriterion("detail <>", value, "detail");
+            return (Criteria) this;
+        }
+
+        public Criteria andDetailGreaterThan(String value) {
+            addCriterion("detail >", value, "detail");
+            return (Criteria) this;
+        }
+
+        public Criteria andDetailGreaterThanOrEqualTo(String value) {
+            addCriterion("detail >=", value, "detail");
+            return (Criteria) this;
+        }
+
+        public Criteria andDetailLessThan(String value) {
+            addCriterion("detail <", value, "detail");
+            return (Criteria) this;
+        }
+
+        public Criteria andDetailLessThanOrEqualTo(String value) {
+            addCriterion("detail <=", value, "detail");
+            return (Criteria) this;
+        }
+
+        public Criteria andDetailLike(String value) {
+            addCriterion("detail like", value, "detail");
+            return (Criteria) this;
+        }
+
+        public Criteria andDetailNotLike(String value) {
+            addCriterion("detail not like", value, "detail");
+            return (Criteria) this;
+        }
+
+        public Criteria andDetailIn(List<String> values) {
+            addCriterion("detail in", values, "detail");
+            return (Criteria) this;
+        }
+
+        public Criteria andDetailNotIn(List<String> values) {
+            addCriterion("detail not in", values, "detail");
+            return (Criteria) this;
+        }
+
+        public Criteria andDetailBetween(String value1, String value2) {
+            addCriterion("detail between", value1, value2, "detail");
+            return (Criteria) this;
+        }
+
+        public Criteria andDetailNotBetween(String value1, String value2) {
+            addCriterion("detail not between", value1, value2, "detail");
+            return (Criteria) this;
+        }
+
         public Criteria andPriceIsNull() {
             addCriterion("price is null");
             return (Criteria) this;

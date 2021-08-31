@@ -7,15 +7,13 @@
     <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="subtitle" jdbcType="VARCHAR" property="subtitle" />
     <result column="main_image" jdbcType="VARCHAR" property="mainImage" />
+    <result column="sub_images" jdbcType="VARCHAR" property="subImages" />
+    <result column="detail" jdbcType="VARCHAR" property="detail" />
     <result column="price" jdbcType="DECIMAL" property="price" />
     <result column="stock" jdbcType="INTEGER" property="stock" />
     <result column="status" jdbcType="INTEGER" property="status" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-  </resultMap>
-  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.github.eric.mall.generate.entity.ProductWithBLOBs">
-    <result column="sub_images" jdbcType="LONGVARCHAR" property="subImages" />
-    <result column="detail" jdbcType="LONGVARCHAR" property="detail" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -76,27 +74,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, category_id, name, subtitle, main_image, price, stock, status, create_time, update_time
+    id, category_id, name, subtitle, main_image, sub_images, detail, price, stock, status, 
+    create_time, update_time
   </sql>
-  <sql id="Blob_Column_List">
-    sub_images, detail
-  </sql>
-  <select id="selectByExampleWithBLOBs" parameterType="com.github.eric.mall.generate.entity.ProductExample" resultMap="ResultMapWithBLOBs">
-    select
-    <if test="distinct">
-      distinct
-    </if>
-    <include refid="Base_Column_List" />
-    ,
-    <include refid="Blob_Column_List" />
-    from mall_product
-    <if test="_parameter != null">
-      <include refid="Example_Where_Clause" />
-    </if>
-    <if test="orderByClause != null">
-      order by ${orderByClause}
-    </if>
-  </select>
   <select id="selectByExample" parameterType="com.github.eric.mall.generate.entity.ProductExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
@@ -111,11 +91,9 @@
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
-    ,
-    <include refid="Blob_Column_List" />
     from mall_product
     where id = #{id,jdbcType=INTEGER}
   </select>
@@ -129,20 +107,20 @@
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.github.eric.mall.generate.entity.ProductWithBLOBs">
+  <insert id="insert" parameterType="com.github.eric.mall.generate.entity.Product">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
       SELECT LAST_INSERT_ID()
     </selectKey>
     insert into mall_product (category_id, name, subtitle, 
-      main_image, price, stock, 
-      status, create_time, update_time, 
-      sub_images, detail)
+      main_image, sub_images, detail, 
+      price, stock, status, 
+      create_time, update_time)
     values (#{categoryId,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{subtitle,jdbcType=VARCHAR}, 
-      #{mainImage,jdbcType=VARCHAR}, #{price,jdbcType=DECIMAL}, #{stock,jdbcType=INTEGER}, 
-      #{status,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{subImages,jdbcType=LONGVARCHAR}, #{detail,jdbcType=LONGVARCHAR})
+      #{mainImage,jdbcType=VARCHAR}, #{subImages,jdbcType=VARCHAR}, #{detail,jdbcType=VARCHAR}, 
+      #{price,jdbcType=DECIMAL}, #{stock,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
   </insert>
-  <insert id="insertSelective" parameterType="com.github.eric.mall.generate.entity.ProductWithBLOBs">
+  <insert id="insertSelective" parameterType="com.github.eric.mall.generate.entity.Product">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
       SELECT LAST_INSERT_ID()
     </selectKey>
@@ -160,6 +138,12 @@
       <if test="mainImage != null">
         main_image,
       </if>
+      <if test="subImages != null">
+        sub_images,
+      </if>
+      <if test="detail != null">
+        detail,
+      </if>
       <if test="price != null">
         price,
       </if>
@@ -175,12 +159,6 @@
       <if test="updateTime != null">
         update_time,
       </if>
-      <if test="subImages != null">
-        sub_images,
-      </if>
-      <if test="detail != null">
-        detail,
-      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="categoryId != null">
@@ -194,6 +172,12 @@
       </if>
       <if test="mainImage != null">
         #{mainImage,jdbcType=VARCHAR},
+      </if>
+      <if test="subImages != null">
+        #{subImages,jdbcType=VARCHAR},
+      </if>
+      <if test="detail != null">
+        #{detail,jdbcType=VARCHAR},
       </if>
       <if test="price != null">
         #{price,jdbcType=DECIMAL},
@@ -209,12 +193,6 @@
       </if>
       <if test="updateTime != null">
         #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="subImages != null">
-        #{subImages,jdbcType=LONGVARCHAR},
-      </if>
-      <if test="detail != null">
-        #{detail,jdbcType=LONGVARCHAR},
       </if>
     </trim>
   </insert>
@@ -242,6 +220,12 @@
       <if test="record.mainImage != null">
         main_image = #{record.mainImage,jdbcType=VARCHAR},
       </if>
+      <if test="record.subImages != null">
+        sub_images = #{record.subImages,jdbcType=VARCHAR},
+      </if>
+      <if test="record.detail != null">
+        detail = #{record.detail,jdbcType=VARCHAR},
+      </if>
       <if test="record.price != null">
         price = #{record.price,jdbcType=DECIMAL},
       </if>
@@ -257,31 +241,7 @@
       <if test="record.updateTime != null">
         update_time = #{record.updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="record.subImages != null">
-        sub_images = #{record.subImages,jdbcType=LONGVARCHAR},
-      </if>
-      <if test="record.detail != null">
-        detail = #{record.detail,jdbcType=LONGVARCHAR},
-      </if>
     </set>
-    <if test="_parameter != null">
-      <include refid="Update_By_Example_Where_Clause" />
-    </if>
-  </update>
-  <update id="updateByExampleWithBLOBs" parameterType="map">
-    update mall_product
-    set id = #{record.id,jdbcType=INTEGER},
-      category_id = #{record.categoryId,jdbcType=INTEGER},
-      name = #{record.name,jdbcType=VARCHAR},
-      subtitle = #{record.subtitle,jdbcType=VARCHAR},
-      main_image = #{record.mainImage,jdbcType=VARCHAR},
-      price = #{record.price,jdbcType=DECIMAL},
-      stock = #{record.stock,jdbcType=INTEGER},
-      status = #{record.status,jdbcType=INTEGER},
-      create_time = #{record.createTime,jdbcType=TIMESTAMP},
-      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
-      sub_images = #{record.subImages,jdbcType=LONGVARCHAR},
-      detail = #{record.detail,jdbcType=LONGVARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -293,6 +253,8 @@
       name = #{record.name,jdbcType=VARCHAR},
       subtitle = #{record.subtitle,jdbcType=VARCHAR},
       main_image = #{record.mainImage,jdbcType=VARCHAR},
+      sub_images = #{record.subImages,jdbcType=VARCHAR},
+      detail = #{record.detail,jdbcType=VARCHAR},
       price = #{record.price,jdbcType=DECIMAL},
       stock = #{record.stock,jdbcType=INTEGER},
       status = #{record.status,jdbcType=INTEGER},
@@ -302,7 +264,7 @@
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
-  <update id="updateByPrimaryKeySelective" parameterType="com.github.eric.mall.generate.entity.ProductWithBLOBs">
+  <update id="updateByPrimaryKeySelective" parameterType="com.github.eric.mall.generate.entity.Product">
     update mall_product
     <set>
       <if test="categoryId != null">
@@ -316,6 +278,12 @@
       </if>
       <if test="mainImage != null">
         main_image = #{mainImage,jdbcType=VARCHAR},
+      </if>
+      <if test="subImages != null">
+        sub_images = #{subImages,jdbcType=VARCHAR},
+      </if>
+      <if test="detail != null">
+        detail = #{detail,jdbcType=VARCHAR},
       </if>
       <if test="price != null">
         price = #{price,jdbcType=DECIMAL},
@@ -332,28 +300,7 @@
       <if test="updateTime != null">
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="subImages != null">
-        sub_images = #{subImages,jdbcType=LONGVARCHAR},
-      </if>
-      <if test="detail != null">
-        detail = #{detail,jdbcType=LONGVARCHAR},
-      </if>
     </set>
-    where id = #{id,jdbcType=INTEGER}
-  </update>
-  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.github.eric.mall.generate.entity.ProductWithBLOBs">
-    update mall_product
-    set category_id = #{categoryId,jdbcType=INTEGER},
-      name = #{name,jdbcType=VARCHAR},
-      subtitle = #{subtitle,jdbcType=VARCHAR},
-      main_image = #{mainImage,jdbcType=VARCHAR},
-      price = #{price,jdbcType=DECIMAL},
-      stock = #{stock,jdbcType=INTEGER},
-      status = #{status,jdbcType=INTEGER},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
-      sub_images = #{subImages,jdbcType=LONGVARCHAR},
-      detail = #{detail,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.github.eric.mall.generate.entity.Product">
@@ -362,6 +309,8 @@
       name = #{name,jdbcType=VARCHAR},
       subtitle = #{subtitle,jdbcType=VARCHAR},
       main_image = #{mainImage,jdbcType=VARCHAR},
+      sub_images = #{subImages,jdbcType=VARCHAR},
+      detail = #{detail,jdbcType=VARCHAR},
       price = #{price,jdbcType=DECIMAL},
       stock = #{stock,jdbcType=INTEGER},
       status = #{status,jdbcType=INTEGER},

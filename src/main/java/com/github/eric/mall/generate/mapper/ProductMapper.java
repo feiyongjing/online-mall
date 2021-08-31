@@ -2,7 +2,6 @@ package com.github.eric.mall.generate.mapper;
 
 import com.github.eric.mall.generate.entity.Product;
 import com.github.eric.mall.generate.entity.ProductExample;
-import com.github.eric.mall.generate.entity.ProductWithBLOBs;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -15,25 +14,19 @@ public interface ProductMapper {
 
     int deleteByPrimaryKey(Integer id);
 
-    int insert(ProductWithBLOBs record);
+    int insert(Product record);
 
-    int insertSelective(ProductWithBLOBs record);
-
-    List<ProductWithBLOBs> selectByExampleWithBLOBs(ProductExample example);
+    int insertSelective(Product record);
 
     List<Product> selectByExample(ProductExample example);
 
-    ProductWithBLOBs selectByPrimaryKey(Integer id);
+    Product selectByPrimaryKey(Integer id);
 
-    int updateByExampleSelective(@Param("record") ProductWithBLOBs record, @Param("example") ProductExample example);
-
-    int updateByExampleWithBLOBs(@Param("record") ProductWithBLOBs record, @Param("example") ProductExample example);
+    int updateByExampleSelective(@Param("record") Product record, @Param("example") ProductExample example);
 
     int updateByExample(@Param("record") Product record, @Param("example") ProductExample example);
 
-    int updateByPrimaryKeySelective(ProductWithBLOBs record);
-
-    int updateByPrimaryKeyWithBLOBs(ProductWithBLOBs record);
+    int updateByPrimaryKeySelective(Product record);
 
     int updateByPrimaryKey(Product record);
 }
