@@ -1,0 +1,38 @@
+POST http://localhost:8080/user/login
+Content-Type: application/json
+
+{
+  "username": "aaa",
+  "password": "111"
+}
+###
+
+POST http://localhost:8080/cart/add
+Content-Type: application/json
+
+{
+  "productId": "26",
+  "selected": "true"
+}
+
+###
+
+POST http://localhost:8080/cart/add
+Content-Type: application/json
+
+{
+  "productId": "27",
+  "selected": "true"
+}
+
+###
+
+POST http://localhost:8080/cart/add
+Content-Type: application/json
+
+{
+  "productId": "28",
+  "selected": "true"
+}
+
+###

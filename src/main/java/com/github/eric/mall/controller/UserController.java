@@ -9,10 +9,7 @@ import com.github.eric.mall.service.UserService;
 import com.github.eric.mall.vo.ResponseVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -26,11 +23,13 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
+    @ResponseBody
     public ResponseVo<User> register(@Valid @RequestBody UserForm userForm){
         return userService.register(userForm);
     }
 
     @PostMapping("/login")
+    @ResponseBody
     public ResponseVo<User> login(@Valid @RequestBody UserLoginForm userLoginForm,
                                   HttpSession session){
         ResponseVo<User> userResponseVo = userService.login(userLoginForm.getUsername(), userLoginForm.getPassword());
@@ -39,6 +38,7 @@ public class UserController {
     }
 
     @GetMapping("/user")
+    @ResponseBody
     public ResponseVo<User> userInfo(HttpSession session){
         User user= (User) session.getAttribute(OnlineMallConst.CURRENT_USER);
         if(user==null){
@@ -48,6 +48,7 @@ public class UserController {
     }
 
     @PostMapping("/logout")
+    @ResponseBody
     public ResponseVo<User> logout(HttpSession session){
         User user= (User) session.getAttribute(OnlineMallConst.CURRENT_USER);
         if(user==null){

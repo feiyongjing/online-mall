@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -58,15 +57,16 @@ public class ProductService {
     }
 
 
-    public ResponseVo<ProductDetailVo> getProductById(Integer productId) {
+    public ProductDetailVo getProductById(Integer productId) {
         Product productInDb = productMapper.selectByPrimaryKey(productId);
         if(productInDb==null
                 || productInDb.getStatus().equals(ProductStatusEnum.OFF_SALE.getCode())
                 || productInDb.getStatus().equals(ProductStatusEnum.DELETE.getCode())){
-            return ResponseVo.error(ResponseEnum.PRODUCT_OFF_SALE_OR_DELETE);
+            throw new RuntimeException(ResponseEnum.PRODUCT_OFF_SALE_OR_DELETE.getDesc());
+//            return ResponseVo.error(ResponseEnum.PRODUCT_OFF_SALE_OR_DELETE);
         }
         ProductDetailVo result =new ProductDetailVo();
         BeanUtils.copyProperties(productInDb,result);
-        return ResponseVo.success(result);
+        return result;
     }
 }

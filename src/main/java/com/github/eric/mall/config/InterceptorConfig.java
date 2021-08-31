@@ -3,6 +3,8 @@ package com.github.eric.mall.config;
 import com.github.pagehelper.PageInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -15,11 +17,14 @@ public class InterceptorConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new UserLoginInterceptor())
                 .addPathPatterns("/**")
-                .excludePathPatterns("/user/login",
+                .excludePathPatterns(
+                        "/error",
+                        "/user/login",
                         "/user/register",
                         "/category/all",
                         "/product/page",
-                        "/product/id");
+                        "/product/id",
+                        "/cart/add");
     }
 
     @Bean
@@ -30,6 +35,13 @@ public class InterceptorConfig implements WebMvcConfigurer {
         properties.setProperty("reasonable", "true");
         pageInterceptor.setProperties(properties);
         return pageInterceptor;
+    }
+
+    @Bean
+    RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(factory);
+        return redisTemplate;
     }
 
 }

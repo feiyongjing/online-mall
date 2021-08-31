@@ -1,4 +1,4 @@
-package com.github.eric.mall.form;
+package com.github.eric.mall.enums;
 
 import lombok.Getter;
 

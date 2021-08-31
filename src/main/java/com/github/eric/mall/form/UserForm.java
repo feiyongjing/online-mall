@@ -5,6 +5,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @Data
 public class UserForm {
@@ -18,7 +19,7 @@ public class UserForm {
     @NotBlank(message = "邮箱不能为空")
     private String email;
 
-    @NotBlank(message = "用户角色不能为空")
+    @NotNull(message = "用户角色不能为空")
     private Integer role;
 
 

@@ -2,7 +2,7 @@ package com.github.eric.mall.service;
 
 import com.github.eric.mall.dao.MyUserMapper;
 import com.github.eric.mall.enums.ResponseEnum;
-import com.github.eric.mall.form.RoleEnum;
+import com.github.eric.mall.enums.RoleEnum;
 import com.github.eric.mall.form.UserForm;
 import com.github.eric.mall.generate.entity.User;
 import com.github.eric.mall.generate.entity.UserExample;
@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 @Service
 public class UserService {

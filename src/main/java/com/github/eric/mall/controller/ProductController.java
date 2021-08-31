@@ -45,7 +45,7 @@ public class ProductController {
     @GetMapping("/id")
     @ResponseBody
     public ResponseVo<ProductDetailVo> getProductById(@RequestParam(value = "productId") Integer productId){
-        return productService.getProductById(productId);
+        return ResponseVo.success(productService.getProductById(productId));
     }
 
 }
