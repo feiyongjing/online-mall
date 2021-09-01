@@ -16,7 +16,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -25,6 +27,13 @@ public class ProductService {
 
     @Autowired
     private ProductMapper productMapper;
+
+    public Map<Integer, Product> findByIdIn(List<Integer> productIds) {
+        ProductExample productExample = new ProductExample();
+        productExample.createCriteria().andIdIn(productIds);
+        List<Product> products = productMapper.selectByExample(productExample);
+        return products.stream().collect(Collectors.toMap(Product::getId, product -> product));
+    }
 
     public ResponseVo<PageInfo<ProductVo>> getProductByCategoryId(Integer categoryId, Integer pageNum, Integer pageSize) {
         Set<Integer> categoryIdSet = categotyService.getCategoryIdSet(categoryId);
@@ -38,7 +47,7 @@ public class ProductService {
                 .andStatusEqualTo(ProductStatusEnum.ON_SALE.getCode())
                 .andCategoryIdIn(new ArrayList<>(categoryIdSet));
 
-        PageHelper.startPage(pageNum,pageSize);
+        PageHelper.startPage(pageNum, pageSize);
         List<Product> products = productMapper.selectByExample(productExample);
 
 
@@ -49,7 +58,7 @@ public class ProductService {
             productVos.add(productVo);
         });
 
-        PageInfo pageInfo=new PageInfo<>(products);
+        PageInfo pageInfo = new PageInfo<>(products);
         pageInfo.setList(productVos);
 //        PageInfo<ProductVo> pageInfo=new PageInfo<>(productVos);
         return pageInfo;
@@ -59,14 +68,14 @@ public class ProductService {
 
     public ProductDetailVo getProductById(Integer productId) {
         Product productInDb = productMapper.selectByPrimaryKey(productId);
-        if(productInDb==null
+        if (productInDb == null
                 || productInDb.getStatus().equals(ProductStatusEnum.OFF_SALE.getCode())
-                || productInDb.getStatus().equals(ProductStatusEnum.DELETE.getCode())){
+                || productInDb.getStatus().equals(ProductStatusEnum.DELETE.getCode())) {
             throw new RuntimeException(ResponseEnum.PRODUCT_OFF_SALE_OR_DELETE.getDesc());
 //            return ResponseVo.error(ResponseEnum.PRODUCT_OFF_SALE_OR_DELETE);
         }
-        ProductDetailVo result =new ProductDetailVo();
-        BeanUtils.copyProperties(productInDb,result);
+        ProductDetailVo result = new ProductDetailVo();
+        BeanUtils.copyProperties(productInDb, result);
         return result;
     }
 }

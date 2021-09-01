@@ -1,20 +1,30 @@
 package com.github.eric.mall.service;
 
+import com.github.eric.mall.enums.ProductStatusEnum;
+import com.github.eric.mall.enums.ResponseEnum;
 import com.github.eric.mall.form.CartAddForm;
+import com.github.eric.mall.form.CartUpdateForm;
+import com.github.eric.mall.generate.entity.Cart;
+import com.github.eric.mall.generate.entity.Product;
+import com.github.eric.mall.generate.mapper.ProductMapper;
 import com.github.eric.mall.vo.CartProductVo;
 import com.github.eric.mall.vo.CartVo;
 import com.github.eric.mall.vo.ProductDetailVo;
 import com.github.eric.mall.vo.ResponseVo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 public class CartService {
+    private static final String CART_REDIS_KEY_TEMPLATE = "cart_%d";
 
     @Autowired
     RedisTemplate redisTemplate;
@@ -22,90 +32,131 @@ public class CartService {
     @Autowired
     ProductService productService;
 
+    @Autowired
+    ProductMapper productMapper;
+
     public ResponseVo<CartVo> getCartProductList(Integer userId) {
 
+        HashOperations<String, Integer, Cart> hashOperations = redisTemplate.opsForHash();
+        Map<Integer, Cart> entries = hashOperations.entries(String.format(CART_REDIS_KEY_TEMPLATE, userId));
+        Set<Integer> productIds = entries.keySet();
 
-        return null;
+        Map<Integer, Product> productMap = productService.findByIdIn(new ArrayList<>(productIds));
+
+        return ResponseVo.success(getCartVo(entries, productMap));
     }
 
-    public CartVo addCartProduct(CartAddForm cartAddForm, Integer userId) {
-        if (redisTemplate.hasKey(userId)) {
-            CartVo cartVo = (CartVo) redisTemplate.opsForValue().get(userId);
-            List<CartProductVo> cartProductVoList = cartVo.getCartProductVoList();
+    private CartVo getCartVo(Map<Integer, Cart> entries, Map<Integer, Product> productMap) {
+        List<CartProductVo> cartProductVoList = new ArrayList<>();
+        boolean selectedAll = true;
+        int cartTotalQuantity = 0;
+        BigDecimal cartTotalPrice = BigDecimal.valueOf(0);
+        for (Map.Entry<Integer, Cart> entrie : entries.entrySet()) {
+            Product product = productMap.get(entrie.getKey());
+            Cart cart = entrie.getValue();
+            CartProductVo cartProductVo = new CartProductVo(product.getId()
+                    , cart.getQuantity()
+                    , product.getName()
+                    , product.getSubtitle()
+                    , product.getMainImage()
+                    , product.getPrice()
+                    , product.getStatus()
+                    , product.getPrice().multiply(BigDecimal.valueOf(cart.getQuantity()))
+                    , product.getStock()
+                    , cart.getProductSelected());
 
-            // 购物车中是否有对应的商品
-            boolean anyMatch = cartProductVoList.stream().anyMatch(cartProductVo -> {
-                return cartProductVo.getProductId().equals(cartAddForm.getProductId());
-            });
-
-            if (anyMatch) {
-                cartProductVoList.forEach(cartProductVo -> {
-                    if (cartProductVo.getProductId().equals(cartAddForm.getProductId())) {
-                        cartProductVo.setQuantity(cartProductVo.getQuantity() + 1);
-                        cartProductVo.setProductTotalPrice(cartProductVo.getProductTotalPrice().add(cartProductVo.getProductPrice()));
-                        cartProductVo.setProductSelected(cartAddForm.getSelected());
-
-                        BigDecimal productPrice = cartProductVo.getProductPrice();
-                        BigDecimal cartTotalPrice = cartVo.getCartTotalPrice();
-
-                        cartVo.setCartTotalPrice(cartTotalPrice.add(productPrice));
-                    }
-                });
-
-                cartVo.setCartProductVoList(cartProductVoList);
-                redisTemplate.opsForValue().set(userId, cartVo);
-                return cartVo;
+            if (cartProductVo.getProductSelected()) {
+                cartTotalQuantity += cartProductVo.getQuantity();
+                cartTotalPrice = cartTotalPrice.add(cartProductVo.getProductTotalPrice());
             } else {
-                // 查询数据库的商品信息，组装好后添加到Redis
-                ProductDetailVo productDetailVo = productService.getProductById(cartAddForm.getProductId());
-
-                CartProductVo cartProductVo = getCartProductVo(productDetailVo);
-
-                cartProductVoList.add(cartProductVo);
-
-                setCartInfo(cartVo,cartProductVoList);
-                redisTemplate.opsForValue().set(userId, cartVo);
-                return cartVo;
+                selectedAll = false;
             }
-        } else {
-            // 缓存中没有购物车信息，查询数据库的商品信息，组装好后添加到Redis
-            CartVo cartVo = new CartVo();
-            ProductDetailVo productDetailVo = productService.getProductById(cartAddForm.getProductId());
-
-            CartProductVo cartProductVo = getCartProductVo(productDetailVo);
-
-            List<CartProductVo> cartProductVoList = new ArrayList<>();
             cartProductVoList.add(cartProductVo);
-
-            setCartInfo(cartVo,cartProductVoList);
-            redisTemplate.opsForValue().set(userId, cartVo);
-            return cartVo;
-
         }
+        return new CartVo(cartProductVoList, selectedAll, cartTotalPrice, cartTotalQuantity);
     }
 
-    private void setCartInfo(CartVo cartVo, List<CartProductVo> cartProductVoList) {
-        cartVo.setCartProductVoList(cartProductVoList);
-        cartVo.setSelectedAll(cartProductVoList.stream().allMatch(CartProductVo::getProductSelected));
-        cartVo.setCartTotalQuantity(cartProductVoList.stream().mapToInt(CartProductVo::getQuantity).sum());
-        cartVo.setCartTotalPrice(cartProductVoList.stream()
-                .map(CartProductVo::getProductTotalPrice).reduce(BigDecimal.ZERO, BigDecimal::add));
+    public ResponseVo<CartVo> addCartProduct(CartAddForm cartAddForm, Integer userId) {
 
+        ProductDetailVo productDetailVo = productService.getProductById(cartAddForm.getProductId());
+        if (productDetailVo == null) {
+            // 没有商品
+            ResponseVo.error(ResponseEnum.PRODUCT_NOT_EXIST);
+        }
+        if (productDetailVo.getStatus().equals(ProductStatusEnum.ON_SALE.getCode())) {
+            // 商品状态不是在售
+            ResponseVo.error(ResponseEnum.PRODUCT_OFF_SALE_OR_DELETE);
+        }
+        if (productDetailVo.getStock() <= 0) {
+            // 商品库存不足
+            ResponseVo.error(ResponseEnum.PRODUCT_STOCK_ERROR);
+        }
+        Integer quantity = 1;
+        HashOperations<String, Integer, Cart> hashOperations = redisTemplate.opsForHash();
+        Cart cart = hashOperations.get(String.format(CART_REDIS_KEY_TEMPLATE, userId),
+                productDetailVo.getId());
+        if (cart == null) {
+            cart = new Cart(productDetailVo.getId(), quantity, cartAddForm.getSelected());
+        } else {
+            cart.setQuantity(cart.getQuantity() + quantity);
+        }
+
+        hashOperations.put(String.format(CART_REDIS_KEY_TEMPLATE, userId),
+                productDetailVo.getId(), cart);
+        return getCartProductList(userId);
     }
 
-    private CartProductVo getCartProductVo(ProductDetailVo productDetailVo) {
-        CartProductVo cartProductVo = new CartProductVo();
+    public ResponseVo<CartVo> updateCartProduct(Integer productId, CartUpdateForm cartUpdateForm, Integer userId) {
+        HashOperations<String, Integer, Cart> hashOperations = redisTemplate.opsForHash();
+        Cart cart = hashOperations.get(String.format(CART_REDIS_KEY_TEMPLATE, userId), productId);
+        if (cart == null) {
+            // 购物车中没有对应的商品
+            return ResponseVo.error(ResponseEnum.CART_PRODUCT_NOT_EXIST);
+        } else {
+            if (cartUpdateForm.getQuantity() != null && cartUpdateForm.getQuantity() >= 0) {
+                cart.setQuantity(cartUpdateForm.getQuantity());
+            }
+            if (cartUpdateForm.getSelected() != null) {
+                cart.setProductSelected(cartUpdateForm.getSelected());
+            }
+        }
 
-        cartProductVo.setProductId(productDetailVo.getId());
-        cartProductVo.setQuantity(1);
-        cartProductVo.setProductName(productDetailVo.getName());
-        cartProductVo.setProductSubtitle(productDetailVo.getSubtitle());
-        cartProductVo.setProductMainImage(productDetailVo.getMainImage());
-        cartProductVo.setProductPrice(productDetailVo.getPrice());
-        cartProductVo.setProductStatus(productDetailVo.getStatus());
-        cartProductVo.setProductTotalPrice(productDetailVo.getPrice().multiply(BigDecimal.valueOf(1)));
-        cartProductVo.setProductStock(productDetailVo.getStock());
-        cartProductVo.setProductSelected(true);
-        return cartProductVo;
+        hashOperations.put(String.format(CART_REDIS_KEY_TEMPLATE, userId),
+                productId, cart);
+        return getCartProductList(userId);
+    }
+
+    public ResponseVo<CartVo> deleteCartProduct(Integer productId, Integer userId) {
+        HashOperations<String, Integer, Cart> hashOperations = redisTemplate.opsForHash();
+        Cart cart = hashOperations.get(String.format(CART_REDIS_KEY_TEMPLATE, userId), productId);
+        if (cart == null) {
+            // 购物车中没有对应的商品
+            return ResponseVo.error(ResponseEnum.CART_PRODUCT_NOT_EXIST);
+        }
+        hashOperations.delete(String.format(CART_REDIS_KEY_TEMPLATE, userId), productId);
+        return getCartProductList(userId);
+    }
+
+    public ResponseVo<CartVo> isSelectAllCartProduct(Integer userId,Boolean selectAll) {
+        HashOperations<String, Integer, Cart> hashOperations = redisTemplate.opsForHash();
+        Map<Integer, Cart> entries = hashOperations.entries(String.format(CART_REDIS_KEY_TEMPLATE, userId));
+
+        for (Map.Entry<Integer, Cart> entrie : entries.entrySet()) {
+            entrie.getValue().setProductSelected(selectAll);
+        }
+        hashOperations.putAll(String.format(CART_REDIS_KEY_TEMPLATE, userId),entries);
+        return getCartProductList(userId);
+    }
+
+    public ResponseVo<Integer> getCartProductSum(Integer userId) {
+        HashOperations<String, Integer, Cart> hashOperations = redisTemplate.opsForHash();
+        Map<Integer, Cart> entries = hashOperations.entries(String.format(CART_REDIS_KEY_TEMPLATE, userId));
+
+        Integer result=0;
+        for (Map.Entry<Integer, Cart> entrie : entries.entrySet()) {
+            result+= entrie.getValue().getQuantity();
+        }
+
+        return ResponseVo.success(result);
     }
 }
