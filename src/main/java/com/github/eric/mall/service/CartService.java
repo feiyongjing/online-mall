@@ -17,10 +17,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class CartService {
@@ -39,6 +36,9 @@ public class CartService {
 
         HashOperations<String, Integer, Cart> hashOperations = redisTemplate.opsForHash();
         Map<Integer, Cart> entries = hashOperations.entries(String.format(CART_REDIS_KEY_TEMPLATE, userId));
+        if(entries.isEmpty()){
+            return ResponseVo.success(getCartVo(entries, new HashMap<>()));
+        }
         Set<Integer> productIds = entries.keySet();
 
         Map<Integer, Product> productMap = productService.findByIdIn(new ArrayList<>(productIds));
