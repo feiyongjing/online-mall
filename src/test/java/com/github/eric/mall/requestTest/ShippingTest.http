@@ -1,0 +1,70 @@
+POST http://localhost:8080/user/login
+Content-Type: application/json
+
+{
+  "username": "aaa",
+  "password": "111"
+}
+###
+
+POST http://localhost:8080/shipping/add
+Content-Type: application/json
+
+{
+  "receiverName": "aaa",
+  "receiverPhone": "010",
+  "receiverMobile": "18688888888",
+  "receiverProvince": "北京",
+  "receiverCity": "北京市",
+  "receiverDistrict": "海淀区",
+  "receiverAddress": "中关村",
+  "receiverZip": "100000"
+}
+
+###
+POST http://localhost:8080/shipping/add
+Content-Type: application/json
+
+{
+  "receiverName": "aaa",
+  "receiverPhone": "010",
+  "receiverMobile": "18688888888",
+  "receiverProvince": "湖北",
+  "receiverCity": "武汉市",
+  "receiverDistrict": "xxx区",
+  "receiverAddress": "xxx村",
+  "receiverZip": "900000"
+}
+
+###
+PUT http://localhost:8080/shipping/update?shippingId=5
+Content-Type: application/json
+
+{
+  "receiverName": "aaa",
+  "receiverPhone": "010",
+  "receiverMobile": "18688888888",
+  "receiverProvince": "上海",
+  "receiverCity": "上海市",
+  "receiverDistrict": "xxx区",
+  "receiverAddress": "xxx村",
+  "receiverZip": "200000"
+}
+
+###
+
+GET http://localhost:8080/shipping/list?pageNum=2&pageSize=1
+Content-Type: application/json
+
+###
+
+GET http://localhost:8080/shipping/list
+Content-Type: application/json
+
+###
+
+DELETE http://localhost:8080/shipping/delete?shippingId=5
+Content-Type: application/json
+###
+
+

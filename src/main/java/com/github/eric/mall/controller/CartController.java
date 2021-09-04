@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 
 @Controller
 @RequestMapping("/cart")
@@ -32,7 +33,7 @@ public class CartController {
 
     @PostMapping("/add")
     @ResponseBody
-    public ResponseVo<CartVo> addCartProduct(@RequestBody CartAddForm cartAddForm, HttpSession session) {
+    public ResponseVo<CartVo> addCartProduct(@Valid @RequestBody CartAddForm cartAddForm, HttpSession session) {
         User user = (User) session.getAttribute(OnlineMallConst.CURRENT_USER);
         if (user == null) {
             return ResponseVo.error(ResponseEnum.NEED_LOGIN);

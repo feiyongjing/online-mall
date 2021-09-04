@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 
 @Controller
 @RequestMapping("/shipping")
@@ -24,7 +25,7 @@ public class ShippingController {
 
     @PostMapping("/add")
     @ResponseBody
-    public ResponseVo<ShippingVo> addShipping(@RequestBody ShippingForm shippingForm, HttpSession session) {
+    public ResponseVo<ShippingVo> addShipping(@Valid @RequestBody ShippingForm shippingForm, HttpSession session) {
         User user = (User) session.getAttribute(OnlineMallConst.CURRENT_USER);
         if (user == null) {
             return ResponseVo.error(ResponseEnum.NEED_LOGIN);
@@ -44,7 +45,7 @@ public class ShippingController {
 
     @PutMapping("/update")
     @ResponseBody
-    public ResponseVo<String> updateByShippingId(@RequestBody ShippingForm shippingForm,
+    public ResponseVo<String> updateByShippingId(@Valid @RequestBody ShippingForm shippingForm,
                                                      @RequestParam("shippingId") Integer shippingId,
                                                      HttpSession session) {
         User user = (User) session.getAttribute(OnlineMallConst.CURRENT_USER);
@@ -54,7 +55,7 @@ public class ShippingController {
         return shippingService.updateByShippingId(shippingForm,shippingId,user.getId());
     }
 
-    @PutMapping("/update")
+    @GetMapping("/list")
     @ResponseBody
     public ResponseVo<PageInfo<Shipping>> getShippingList(@RequestParam(value = "pageNum", required = false) Integer pageNum,
                                                           @RequestParam(value = "pageSize", required = false) Integer pageSize,
