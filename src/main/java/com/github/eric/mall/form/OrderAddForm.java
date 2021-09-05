@@ -14,5 +14,5 @@ public class OrderAddForm {
     @NotNull(message = "地址Id不能是空")
     private Integer shippingId;
     @NotEmpty(message = "商品Id列表不能是空")
-    private Map<Integer,Integer> productIdAndNumber;
+    private Map<Integer,Integer> productIdAndNumberMap;
 }

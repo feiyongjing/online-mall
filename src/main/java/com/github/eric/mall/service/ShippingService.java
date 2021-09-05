@@ -75,4 +75,8 @@ public class ShippingService {
         PageInfo<Shipping> pageInfo = new PageInfo<>(shippings);
         return ResponseVo.success(pageInfo);
     }
+
+    public Shipping getById(Integer shippingId) {
+        return shippingMapper.selectByPrimaryKey(shippingId);
+    }
 }
