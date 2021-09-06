@@ -26,5 +26,6 @@
         <mapper resource="db/mybatis/mappers/MyUserMapper.xml"/>
         <mapper resource="db/mybatis/mappers/MyCategoryMapper.xml"/>
         <mapper resource="db/mybatis/mappers/MyOrderItemMapper.xml"/>
+        <mapper resource="db/mybatis/mappers/MyProductMapper.xml"/>
     </mappers>
 </configuration>

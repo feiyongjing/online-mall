@@ -21,7 +21,7 @@ import java.util.*;
 
 @Service
 public class CartService {
-    private static final String CART_REDIS_KEY_TEMPLATE = "cart_%d";
+    public static final String CART_REDIS_KEY_TEMPLATE = "cart_%d";
 
     @Autowired
     RedisTemplate redisTemplate;

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.eric.mall.dao.MyProductMapper">
+    <update id="batchUpdateByPrimaryKeys" parameterType="list">
+        update mall_product
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="stock =case" suffix="end,">
+                <foreach collection="productList" item="item" index="index">
+                    when id=#{item.id} then #{item.stock}
+                </foreach>
+            </trim>
+        </trim>
+        where id in
+        <foreach collection="productList" item="item" index="index">
+            #{item.id}
+        </foreach>
+    </update>
+</mapper>
