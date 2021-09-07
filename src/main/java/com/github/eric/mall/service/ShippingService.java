@@ -76,7 +76,23 @@ public class ShippingService {
         return ResponseVo.success(pageInfo);
     }
 
-    public Shipping getById(Integer shippingId) {
-        return shippingMapper.selectByPrimaryKey(shippingId);
+    public Shipping getById(Integer shippingId,Integer userId) {
+        Shipping shipping=shippingMapper.selectByPrimaryKey(shippingId);
+        if (shipping == null || !Objects.equals(shipping.getUserId(), userId)) {
+            // 地址不存在
+            throw new RuntimeException();
+        }
+        return shipping;
+    }
+
+    public List<Shipping> getShippingListByIdsAndUser(List<Integer> ids,Integer userId) {
+        ShippingExample shippingExample=new ShippingExample();
+        shippingExample.createCriteria().andIdIn(ids).andUserIdEqualTo(userId);
+        List<Shipping> shippingList=shippingMapper.selectByExample(shippingExample);
+        if (shippingList.isEmpty()) {
+            // 地址不存在
+            throw new RuntimeException();
+        }
+        return shippingList;
     }
 }

@@ -1,5 +1,6 @@
 package com.github.eric.mall.service;
 
+import com.github.eric.mall.dao.MyProductMapper;
 import com.github.eric.mall.enums.ProductStatusEnum;
 import com.github.eric.mall.enums.ResponseEnum;
 import com.github.eric.mall.generate.entity.Product;
@@ -27,6 +28,9 @@ public class ProductService {
 
     @Autowired
     private ProductMapper productMapper;
+
+    @Autowired
+    MyProductMapper myProductMapper;
 
     public Map<Integer, Product> findByIdIn(List<Integer> productIds) {
         ProductExample productExample = new ProductExample();
@@ -77,5 +81,9 @@ public class ProductService {
         ProductDetailVo result = new ProductDetailVo();
         BeanUtils.copyProperties(productInDb, result);
         return result;
+    }
+
+    public int batchUpdateByPrimaryKeys(List<Product> productList) {
+        return myProductMapper.batchUpdateByPrimaryKeys(productList);
     }
 }
