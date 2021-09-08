@@ -59,6 +59,7 @@ public class OrderService {
         List<OrderItem> orderItemList = new ArrayList<>();
 
         // 校验商品是否存在，库存是否充足
+        checkOrderProductList(orderAddForm.getProductIdAndNumberMap());
         Map<Integer, Product> productIdAndProductMap = productService
                 .findByIdIn(new ArrayList<>(orderAddForm.getProductIdAndNumberMap().keySet()));
         checkOrderProduct(orderAddForm, userId, orderNo, orderItemList, productIdAndProductMap);
@@ -100,11 +101,16 @@ public class OrderService {
             Map<Integer, Integer> productIdAndNumberMap = entries.values().stream()
                     .filter(Cart::getProductSelected)
                     .collect(Collectors.toMap(Cart::getProductId, Cart::getQuantity));
-            if (productIdAndNumberMap.isEmpty()) {
-                // 购物车中没有选中的商品
-                throw new RuntimeException();
-            }
+            // 购物车中没有选中的商品
+            checkOrderProductList(productIdAndNumberMap);
             orderAddForm.setProductIdAndNumberMap(productIdAndNumberMap);
+        }
+    }
+
+    private void checkOrderProductList(Map<Integer, Integer> productIdAndNumberMap) {
+        if (productIdAndNumberMap.isEmpty()) {
+            // 直接下订单没传递商品列表或购物车中没有选中的商品
+            throw new RuntimeException();
         }
     }
 

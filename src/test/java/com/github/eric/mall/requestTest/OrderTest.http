@@ -1,0 +1,45 @@
+POST http://localhost:8080/user/login
+Content-Type: application/json
+
+{
+  "username": "aaa",
+  "password": "111"
+}
+
+###
+POST http://localhost:8080/order/add
+Content-Type: application/json
+
+{
+  "orderWay": "0",
+  "shippingId": "6",
+  "productIdAndNumberMap": {
+    "26": "2",
+    "27": "3"
+  }
+}
+
+###
+
+POST http://localhost:8080/order/add
+Content-Type: application/json
+
+{
+  "orderWay": "1",
+  "shippingId": "6",
+  "productIdAndNumberMap": {}
+}
+
+###
+GET http://localhost:8080/order/list?pageNum=1&pageSize=10
+Accept: application/json
+
+###
+GET http://localhost:8080/order/item?orderNo=1631103561961
+Accept: application/json
+
+###
+DELETE http://localhost:8080/order/delete?orderNo=1631103561961
+Accept: application/json
+
+###

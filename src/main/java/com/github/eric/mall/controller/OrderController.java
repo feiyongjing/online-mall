@@ -10,14 +10,13 @@ import com.github.eric.mall.service.ShippingService;
 import com.github.eric.mall.vo.OrderVo;
 import com.github.eric.mall.vo.ResponseVo;
 import com.github.pagehelper.PageInfo;
-import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
-import java.util.List;
+import javax.validation.Valid;
 
 @Controller
 @RequestMapping("/order")
@@ -33,7 +32,7 @@ public class OrderController {
 
     @PostMapping("/add")
     @ResponseBody
-    public ResponseVo<OrderVo> addOrder(@RequestBody OrderAddForm orderAddForm, HttpSession session) {
+    public ResponseVo<OrderVo> addOrder(@Valid @RequestBody OrderAddForm orderAddForm, HttpSession session) {
 
         User user = (User) session.getAttribute(OnlineMallConst.CURRENT_USER);
         if (user == null) {

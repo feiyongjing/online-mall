@@ -2,6 +2,7 @@ package com.github.eric.mall.controller;
 
 
 import com.github.eric.mall.enums.ResponseEnum;
+import com.github.eric.mall.exception.ResultException;
 import com.github.eric.mall.exception.UserLoginException;
 import com.github.eric.mall.generate.entity.User;
 import com.github.eric.mall.vo.ResponseVo;
@@ -26,6 +27,12 @@ public class ErrorHandingController {
     @ExceptionHandler(RuntimeException.class)
     public @ResponseBody
     ResponseVo<User> onRuntimeException(HttpServletResponse response,RuntimeException e) {
+        return ResponseVo.error(ERROR,e.getMessage());
+    }
+
+    @ExceptionHandler(ResultException.class)
+    public @ResponseBody
+    ResponseVo<User> onRuntimeException(HttpServletResponse response,ResultException e) {
         return ResponseVo.error(ERROR,e.getMessage());
     }
 
