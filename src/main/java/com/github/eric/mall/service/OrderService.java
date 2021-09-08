@@ -5,6 +5,7 @@ import com.github.eric.mall.enums.OrderStatusEnum;
 import com.github.eric.mall.enums.OrderWayEnum;
 import com.github.eric.mall.enums.PaymentTypeEnum;
 import com.github.eric.mall.enums.ProductStatusEnum;
+import com.github.eric.mall.exception.ResultException;
 import com.github.eric.mall.form.OrderAddForm;
 import com.github.eric.mall.generate.entity.*;
 import com.github.eric.mall.generate.mapper.OrderMapper;
@@ -254,6 +255,13 @@ public class OrderService {
                 // 此订单取消失败
                 throw new RuntimeException();
             }
+        }
+    }
+
+    public void updateOrderStatusByOrderNo(Long orderNo) {
+        int row=myOrderMapper.updateOrderStatusByOrderNo(orderNo, OrderStatusEnum.PAID.getCode());
+        if(row<=0){
+            throw new ResultException("订单错误");
         }
     }
 }

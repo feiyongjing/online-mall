@@ -5,6 +5,11 @@
         id, order_no, user_id, shipping_id, payment, payment_type, postage, status, payment_time,
     send_time, end_time, close_time, create_time, update_time
     </sql>
+    <update id="updateOrderStatusByOrderNo" parameterType="Map">
+        update mall_order
+        set status = #{status}
+        where orderNo = #{orderNo}
+    </update>
     <select id="getByOrderNo" resultType="com.github.eric.mall.generate.entity.Order">
         select
         <include refid="Base_Column_List"/>
