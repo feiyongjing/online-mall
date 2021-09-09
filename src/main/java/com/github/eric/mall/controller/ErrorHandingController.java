@@ -32,7 +32,7 @@ public class ErrorHandingController {
 
     @ExceptionHandler(ResultException.class)
     public @ResponseBody
-    ResponseVo<User> onRuntimeException(HttpServletResponse response,ResultException e) {
+    ResponseVo<User> onResultException(HttpServletResponse response,ResultException e) {
         return ResponseVo.error(ERROR,e.getMessage());
     }
 

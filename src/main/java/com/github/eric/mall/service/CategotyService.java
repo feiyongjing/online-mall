@@ -20,7 +20,7 @@ public class CategotyService {
     public ResponseVo<List<CategoryVo>> selectAll() {
         List<CategoryVo> categoryVoList = new ArrayList<>();
         List<Category> categoryInDbs = myCategoryMapper.selectAll();
-        categoryInDbs.removeIf(category -> removeAndReturnData(categoryVoList, category, OnlineMallConst.ROOT_PARENT_ID));
+        categoryInDbs.removeIf(category -> removeAndReturnData(categoryVoList, category, Integer.valueOf(OnlineMallConst.ROOT_PARENT_ID)));
         classify(categoryInDbs, categoryVoList);
         return ResponseVo.success(categoryVoList);
 

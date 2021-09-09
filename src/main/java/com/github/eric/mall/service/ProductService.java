@@ -3,6 +3,7 @@ package com.github.eric.mall.service;
 import com.github.eric.mall.dao.MyProductMapper;
 import com.github.eric.mall.enums.ProductStatusEnum;
 import com.github.eric.mall.enums.ResponseEnum;
+import com.github.eric.mall.exception.ResultException;
 import com.github.eric.mall.generate.entity.Product;
 import com.github.eric.mall.generate.entity.ProductExample;
 import com.github.eric.mall.generate.mapper.ProductMapper;
@@ -75,8 +76,7 @@ public class ProductService {
         if (productInDb == null
                 || productInDb.getStatus().equals(ProductStatusEnum.OFF_SALE.getCode())
                 || productInDb.getStatus().equals(ProductStatusEnum.DELETE.getCode())) {
-            throw new RuntimeException(ResponseEnum.PRODUCT_OFF_SALE_OR_DELETE.getDesc());
-//            return ResponseVo.error(ResponseEnum.PRODUCT_OFF_SALE_OR_DELETE);
+            throw new ResultException(ResponseEnum.PRODUCT_OFF_SALE_OR_DELETE.getDesc());
         }
         ProductDetailVo result = new ProductDetailVo();
         BeanUtils.copyProperties(productInDb, result);

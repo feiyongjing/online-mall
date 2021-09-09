@@ -26,19 +26,10 @@ public class ProductController {
     @GetMapping("/page")
     @ResponseBody
     public ResponseVo<PageInfo<ProductVo>> getProductByCategoryId(
-            @RequestParam(value = "categoryId", required = false) Integer categoryId,
-            @RequestParam(value = "pageNum", required = false) Integer pageNum,
-            @RequestParam(value = "pageSize", required = false) Integer pageSize
+            @RequestParam(value = "categoryId", defaultValue =OnlineMallConst.ROOT_PARENT_ID) Integer categoryId,
+            @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
+            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
     ) {
-        if(categoryId==null){
-            categoryId= OnlineMallConst.ROOT_PARENT_ID;
-        }
-        if(pageNum==null){
-            pageNum=1;
-        }
-        if(pageSize==null){
-            pageSize=10;
-        }
         return productService.getProductByCategoryId(categoryId,pageNum,pageSize);
     }
 

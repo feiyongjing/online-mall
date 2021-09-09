@@ -20,11 +20,7 @@ public class InterceptorConfig implements WebMvcConfigurer {
                 .excludePathPatterns(
                         "/error",
                         "/user/login",
-                        "/user/register",
-                        "/category/all",
-                        "/product/page",
-                        "/product/id",
-                        "/cart/add");
+                        "/user/register");
     }
 
     @Bean

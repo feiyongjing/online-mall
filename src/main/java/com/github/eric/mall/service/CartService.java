@@ -2,6 +2,7 @@ package com.github.eric.mall.service;
 
 import com.github.eric.mall.enums.ProductStatusEnum;
 import com.github.eric.mall.enums.ResponseEnum;
+import com.github.eric.mall.exception.ResultException;
 import com.github.eric.mall.form.CartAddForm;
 import com.github.eric.mall.form.CartUpdateForm;
 import com.github.eric.mall.generate.entity.Cart;
@@ -16,6 +17,7 @@ import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.xml.transform.Result;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -38,7 +40,6 @@ public class CartService {
             return getCartVo(entries, new HashMap<>());
         }
         Set<Integer> productIds = entries.keySet();
-
         Map<Integer, Product> productMap = productService.findByIdIn(new ArrayList<>(productIds));
 
         return getCartVo(entries, productMap);
@@ -82,18 +83,7 @@ public class CartService {
     public CartVo addCartProduct(CartAddForm cartAddForm, Integer userId) {
 
         ProductDetailVo productDetailVo = productService.getProductById(cartAddForm.getProductId());
-        if (productDetailVo == null) {
-            // 没有商品
-            ResponseVo.error(ResponseEnum.PRODUCT_NOT_EXIST);
-        }
-        if (productDetailVo.getStatus().equals(ProductStatusEnum.ON_SALE.getCode())) {
-            // 商品状态不是在售
-            ResponseVo.error(ResponseEnum.PRODUCT_OFF_SALE_OR_DELETE);
-        }
-        if (productDetailVo.getStock() <= 0) {
-            // 商品库存不足
-            ResponseVo.error(ResponseEnum.PRODUCT_STOCK_ERROR);
-        }
+        checkProduct(productDetailVo);
         Integer quantity = 1;
         HashOperations<String, Integer, Cart> hashOperations = redisTemplate.opsForHash();
         Cart cart = hashOperations.get(String.format(CART_REDIS_KEY_TEMPLATE, userId),
@@ -107,6 +97,18 @@ public class CartService {
         hashOperations.put(String.format(CART_REDIS_KEY_TEMPLATE, userId),
                 productDetailVo.getId(), cart);
         return getCartProductList(userId);
+    }
+
+    private void checkProduct(ProductDetailVo productDetailVo) {
+        if (productDetailVo == null) {
+            throw new ResultException(ResponseEnum.PRODUCT_NOT_EXIST.getDesc());
+        }
+        if (productDetailVo.getStatus().equals(ProductStatusEnum.ON_SALE.getCode())) {
+            throw new ResultException(ResponseEnum.PRODUCT_OFF_SALE_OR_DELETE.getDesc());
+        }
+        if (productDetailVo.getStock() <= 0) {
+            throw new ResultException(ResponseEnum.PRODUCT_STOCK_ERROR.getDesc());
+        }
     }
 
     public CartVo updateCartProduct(Integer productId, CartUpdateForm cartUpdateForm, Integer userId) {
@@ -134,9 +136,7 @@ public class CartService {
         HashOperations<String, Integer, Cart> hashOperations = redisTemplate.opsForHash();
         Cart cart = hashOperations.get(String.format(CART_REDIS_KEY_TEMPLATE, userId), productId);
         if (cart == null) {
-            // 购物车中没有对应的商品
-            ResponseVo.error(ResponseEnum.CART_PRODUCT_NOT_EXIST);
-            throw new RuntimeException();
+            throw new ResultException(ResponseEnum.CART_PRODUCT_NOT_EXIST.getDesc());
         }
         hashOperations.delete(String.format(CART_REDIS_KEY_TEMPLATE, userId), productId);
         return getCartProductList(userId);
@@ -146,6 +146,7 @@ public class CartService {
         HashOperations<String, Integer, Cart> hashOperations = redisTemplate.opsForHash();
         Map<Integer, Cart> entries = hashOperations.entries(String.format(CART_REDIS_KEY_TEMPLATE, userId));
 
+        //TODO 只有商品状态正常的商品选中
         for (Map.Entry<Integer, Cart> entrie : entries.entrySet()) {
             entrie.getValue().setProductSelected(selectAll);
         }

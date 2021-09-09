@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.eric.mall.dao.MyShippingMapper">
+    <sql id="Base_Column_List">
+        id, user_id, receiver_name, receiver_phone, receiver_mobile, receiver_province, receiver_city,
+    receiver_district, receiver_address, receiver_zip, create_time, update_time
+    </sql>
+    <select id="selectByIdAnduserId" parameterMap="Map" resultType="com.github.eric.mall.generate.entity.Shipping">
+        select
+        <include refid="Base_Column_List"/>
+        from mall_shipping
+        where id=#{id} and user_id=#{userId}
+
+    </select>
+</mapper>

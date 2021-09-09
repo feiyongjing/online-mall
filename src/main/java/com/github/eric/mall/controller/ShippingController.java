@@ -27,9 +27,6 @@ public class ShippingController {
     @ResponseBody
     public ResponseVo<ShippingVo> addShipping(@Valid @RequestBody ShippingForm shippingForm, HttpSession session) {
         User user = (User) session.getAttribute(OnlineMallConst.CURRENT_USER);
-        if (user == null) {
-            return ResponseVo.error(ResponseEnum.NEED_LOGIN);
-        }
         return shippingService.addShipping(shippingForm, user.getId());
     }
 
@@ -37,9 +34,6 @@ public class ShippingController {
     @ResponseBody
     public ResponseVo<String> deleteByShippingId(@RequestParam("shippingId") Integer shippingId, HttpSession session) {
         User user = (User) session.getAttribute(OnlineMallConst.CURRENT_USER);
-        if (user == null) {
-            return ResponseVo.error(ResponseEnum.NEED_LOGIN);
-        }
         return shippingService.deleteByShippingId(shippingId, user.getId());
     }
 
@@ -49,27 +43,15 @@ public class ShippingController {
                                                      @RequestParam("shippingId") Integer shippingId,
                                                      HttpSession session) {
         User user = (User) session.getAttribute(OnlineMallConst.CURRENT_USER);
-        if (user == null) {
-            return ResponseVo.error(ResponseEnum.NEED_LOGIN);
-        }
         return shippingService.updateByShippingId(shippingForm,shippingId,user.getId());
     }
 
     @GetMapping("/list")
     @ResponseBody
-    public ResponseVo<PageInfo<Shipping>> getShippingList(@RequestParam(value = "pageNum", required = false) Integer pageNum,
-                                                          @RequestParam(value = "pageSize", required = false) Integer pageSize,
+    public ResponseVo<PageInfo<Shipping>> getShippingList(@RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
+                                                          @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
                                                           HttpSession session) {
-        if(pageNum==null){
-            pageNum=1;
-        }
-        if(pageSize==null){
-            pageSize=10;
-        }
         User user = (User) session.getAttribute(OnlineMallConst.CURRENT_USER);
-        if (user == null) {
-            return ResponseVo.error(ResponseEnum.NEED_LOGIN);
-        }
         return shippingService.getShippingList(pageNum,pageSize,user.getId());
     }
 }

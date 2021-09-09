@@ -24,6 +24,5 @@ public class PayMsgListener {
             orderService.updateOrderStatusByOrderNo(payInfo.getOrderNo());
         }
 
-
     }
 }

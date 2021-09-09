@@ -1,10 +1,7 @@
 package com.github.eric.mall.service;
 
 import com.github.eric.mall.dao.MyOrderMapper;
-import com.github.eric.mall.enums.OrderStatusEnum;
-import com.github.eric.mall.enums.OrderWayEnum;
-import com.github.eric.mall.enums.PaymentTypeEnum;
-import com.github.eric.mall.enums.ProductStatusEnum;
+import com.github.eric.mall.enums.*;
 import com.github.eric.mall.exception.ResultException;
 import com.github.eric.mall.form.OrderAddForm;
 import com.github.eric.mall.generate.entity.*;
@@ -51,7 +48,7 @@ public class OrderService {
     @Transactional
     public OrderVo addOrder(OrderAddForm orderAddForm, Integer userId) {
         // 获取收获地址并校验
-        Shipping shipping = shippingService.getById(orderAddForm.getShippingId(), userId);
+        Shipping shipping = shippingService.getShippingByIdAndUserId(orderAddForm.getShippingId(), userId);
 
         // 判断是否是直接下单还是购物车下单
         checkOrderWay(orderAddForm, userId);
@@ -64,7 +61,6 @@ public class OrderService {
         Map<Integer, Product> productIdAndProductMap = productService
                 .findByIdIn(new ArrayList<>(orderAddForm.getProductIdAndNumberMap().keySet()));
         checkOrderProduct(orderAddForm, userId, orderNo, orderItemList, productIdAndProductMap);
-        // TODO 注意事务
         // 生成订单order和order-item 还有商品表的库存减少
         Order order = buildOrder(userId, orderNo, orderAddForm.getShippingId(), orderItemList);
         addOrderAndOrderItem(order, orderItemList, new ArrayList<>(productIdAndProductMap.values()), userId, orderAddForm);
@@ -79,15 +75,15 @@ public class OrderService {
             Product product = productIdAndProductMap.get(productId);
             // 商品是否存在
             if (!productIdAndProductMap.containsKey(productId)) {
-                throw new RuntimeException();
+                throw new ResultException(ResponseEnum.PRODUCT_NOT_EXIST.getDesc());
             }
             // 商品是否在售
             if (!product.getStatus().equals(ProductStatusEnum.ON_SALE.getCode())) {
-                throw new RuntimeException();
+                throw new ResultException(ResponseEnum.PRODUCT_OFF_SALE_OR_DELETE.getDesc());
             }
             // 库存是否充足
             if (product.getStock() < number) {
-                throw new RuntimeException();
+                throw new ResultException(ResponseEnum.PRODUCT_STOCK_ERROR.getDesc());
             }
             orderItemList.add(buildOrderItem(userId, orderNo, number, product));
             // 对商品信息的库存减少
@@ -111,24 +107,19 @@ public class OrderService {
     private void checkOrderProductList(Map<Integer, Integer> productIdAndNumberMap) {
         if (productIdAndNumberMap.isEmpty()) {
             // 直接下订单没传递商品列表或购物车中没有选中的商品
-            throw new RuntimeException();
+            throw new ResultException("订单商品列表为空");
+        }
+    }
+    public void checkDatabaseUpdateOperations(int row, String msg){
+        if (row <= 0) {
+            throw new ResultException(msg);
         }
     }
 
-
     public void addOrderAndOrderItem(Order order, List<OrderItem> orderItemList, List<Product> productList, Integer userId, OrderAddForm orderAddForm) {
-        int row = orderMapper.insertSelective(order);
-        if (row <= 0) {
-            throw new RuntimeException();
-        }
-        row = orderItemService.insertOrderItemList(orderItemList);
-        if (row <= 0) {
-            throw new RuntimeException();
-        }
-        row = productService.batchUpdateByPrimaryKeys(productList);
-        if (row <= 0) {
-            throw new RuntimeException();
-        }
+        checkDatabaseUpdateOperations(orderMapper.insertSelective(order),"下单失败");
+        checkDatabaseUpdateOperations(orderItemService.insertOrderItemList(orderItemList),"下单失败");
+        checkDatabaseUpdateOperations(productService.batchUpdateByPrimaryKeys(productList),"下单失败");
 
         if (orderAddForm.getOrderWay().equals(OrderWayEnum.CART_ORDER.getCode())) {
             HashOperations<String, Integer, Cart> hashOperations = redisTemplate.opsForHash();
@@ -226,11 +217,10 @@ public class OrderService {
     public OrderVo getOrderByOrderNo(Long orderNo, Integer userId) {
         Order order = myOrderMapper.getByOrderNo(orderNo);
         if (order == null || !order.getUserId().equals(userId)) {
-            // 订单不存在
-            throw new RuntimeException();
+            throw new ResultException("订单不存在");
         }
         List<OrderItem> orderItemList = orderItemService.getOrderItemListByOrderNo(orderNo);
-        Shipping shipping = shippingService.getById(order.getShippingId(), userId);
+        Shipping shipping = shippingService.getShippingByIdAndUserId(order.getShippingId(), userId);
         return getOrderVo(order, orderItemList, shipping);
     }
 
@@ -238,13 +228,11 @@ public class OrderService {
     public void deleteOrderByOrderNo(Long orderNo, Integer userId) {
         Order order = myOrderMapper.getByOrderNo(orderNo);
         if (order == null || !order.getUserId().equals(userId)) {
-            // 订单不存在
-            throw new RuntimeException();
+            throw new ResultException("订单不存在");
         }
 
         if (Objects.equals(order.getStatus(), OrderStatusEnum.PAID.getCode())) {
-            // 此订单已付款，无法被取消
-            throw new RuntimeException();
+            throw new ResultException("此订单已付款，无法被取消");
         }
         if (Objects.equals(order.getStatus(), OrderStatusEnum.NO_PAY.getCode())) {
             // 此订单未付款，可以取消
@@ -253,7 +241,7 @@ public class OrderService {
             int row = orderMapper.updateByPrimaryKeySelective(order);
             if(row<=0){
                 // 此订单取消失败
-                throw new RuntimeException();
+                throw new ResultException("此订单取消失败");
             }
         }
     }
