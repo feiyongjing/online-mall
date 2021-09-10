@@ -3,6 +3,7 @@ package com.github.eric.mall.service;
 import com.github.eric.mall.dao.MyUserMapper;
 import com.github.eric.mall.enums.ResponseEnum;
 import com.github.eric.mall.enums.RoleEnum;
+import com.github.eric.mall.exception.ResultException;
 import com.github.eric.mall.form.UserForm;
 import com.github.eric.mall.generate.entity.User;
 import com.github.eric.mall.generate.entity.UserExample;
@@ -29,14 +30,14 @@ public class UserService {
         userExample.createCriteria().andUsernameEqualTo(userForm.getUsername());
         long sameNameCount = userMapper.countByExample(userExample);
         if(sameNameCount!=0){
-            return ResponseVo.error(ResponseEnum.USERNAME_EXIST);
+            throw new ResultException(ResponseEnum.USERNAME_EXIST.getDesc());
         }
 
-        userExample=new UserExample();
+        userExample.clear();
         userExample.createCriteria().andEmailEqualTo(userForm.getEmail());
         long sameEmailCount = userMapper.countByExample(userExample);
         if(sameEmailCount!=0){
-            return ResponseVo.error(ResponseEnum.EMAIL_EXIST);
+            throw new ResultException(ResponseEnum.EMAIL_EXIST.getDesc());
         }
 
         userForm.setPassword(DigestUtils.md5DigestAsHex(userForm.getPassword().getBytes(StandardCharsets.UTF_8)));
@@ -46,8 +47,7 @@ public class UserService {
 
         int resultCount = userMapper.insertSelective(user);
         if(resultCount!=1){
-//            throw new RuntimeException("注册失败");
-            return ResponseVo.error(ResponseEnum.ERROR);
+            throw new ResultException("注册失败");
         }
 
         return ResponseVo.success();

@@ -22,5 +22,10 @@ public class UserForm {
     @NotNull(message = "用户角色不能为空")
     private Integer role;
 
-
+    public UserForm(@NotEmpty(message = "用户名不能为空") String username, @NotBlank(message = "密码不能为空") String password, @NotBlank(message = "邮箱不能为空") String email, @NotNull(message = "用户角色不能为空") Integer role) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.role = role;
+    }
 }

@@ -10,7 +10,7 @@ GET http://localhost:8080/product/id?productId=28
 Accept: application/json
 
 ###
-GET http://localhost:8080/product/page
+GET http://localhost:8080/product/page?categoryId=100002
 Accept: application/json
 
 ###
