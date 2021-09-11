@@ -5,10 +5,13 @@ import com.github.eric.mall.form.UserForm;
 import com.github.eric.mall.generate.entity.User;
 import com.github.eric.mall.vo.ResponseVo;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 
+@Transactional
 public class UserServiceTest extends AbstractUnitTest{
 
     public static final String USERNAME="aaa";
@@ -19,7 +22,7 @@ public class UserServiceTest extends AbstractUnitTest{
     @Autowired
     UserService userService;
 
-    @Test
+    @BeforeEach
     public void registerTest(){
         ResponseVo<User> responseVo = userService.register(new UserForm(USERNAME, PASSWORD, EMAIL, ROLE));
         Assertions.assertEquals(ResponseEnum.SUCCESS.getCode(),responseVo.getStatus());
@@ -31,7 +34,7 @@ public class UserServiceTest extends AbstractUnitTest{
         User user = responseVo.getData();
         Assertions.assertEquals(ResponseEnum.SUCCESS.getCode(),responseVo.getStatus());
         Assertions.assertEquals(USERNAME,user.getUsername());
-        Assertions.assertEquals(PASSWORD,user.getPassword());
+        Assertions.assertEquals("",user.getPassword());
         Assertions.assertEquals(EMAIL,user.getEmail());
         Assertions.assertEquals(ROLE,user.getRole());
     }

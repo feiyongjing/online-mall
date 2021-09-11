@@ -1,15 +1,15 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/mall?characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3307/mall-test?characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true
     username: root
     password: root
     driverClassName: com.mysql.cj.jdbc.Driver
   redis:
     host: localhost
-    port: 6379
+    port: 6380
   rabbitmq:
     host: localhost
-    port: 5672
+    port: 5673
     username: admin
     password: admin
 

@@ -40,6 +40,12 @@ public enum ResponseEnum {
     ORDER_STATUS_ERROR(20, "订单状态有误"),
 
     PRODUCT_UNDER_STOCK(21,"商品库存不足"),
+
+    DELETE_SHIPPING_SUCCESS(22, "删除收货地址成功"),
+
+    UPDATE_SHIPPING_SUCCESS(23, "修改收货地址成功"),
+
+    UPDATE_SHIPPING_FAIL(24, "修改收货地址失败"),
     ;
 
     Integer code;

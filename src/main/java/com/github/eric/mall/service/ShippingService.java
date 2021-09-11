@@ -45,7 +45,7 @@ public class ShippingService {
     public ResponseVo<String> deleteByShippingId(Integer shippingId, Integer userId) {
         Shipping shipping = getShippingByIdAndUserId(shippingId, userId);
         checkDatabaseUpdateOperations(shippingMapper.deleteByPrimaryKey(shipping.getId()),ResponseEnum.DELETE_SHIPPING_FAIL.getDesc());
-        return ResponseVo.success("删除地址成功");
+        return ResponseVo.success(ResponseEnum.DELETE_SHIPPING_SUCCESS.getDesc());
     }
 
     public ResponseVo<String> updateByShippingId(ShippingForm shippingForm, Integer shippingId, Integer userId) {
@@ -56,12 +56,12 @@ public class ShippingService {
         shipping.setId(shippingInDb.getId());
         shipping.setUserId(shippingInDb.getUserId());
 
-        checkDatabaseUpdateOperations(shippingMapper.updateByPrimaryKeySelective(shipping),"修改地址失败");
-        return ResponseVo.success("修改地址成功");
+        checkDatabaseUpdateOperations(shippingMapper.updateByPrimaryKeySelective(shipping),ResponseEnum.UPDATE_SHIPPING_FAIL.getDesc());
+        return ResponseVo.success(ResponseEnum.UPDATE_SHIPPING_SUCCESS.getDesc());
     }
 
     public Shipping getShippingByIdAndUserId(Integer shippingId, Integer userId) {
-        Shipping shippingInDb = myShippingMapper.selectByIdAnduserId(shippingId, userId);
+        Shipping shippingInDb = myShippingMapper.selectByIdAndUserId(shippingId, userId);
         if (shippingInDb == null) {
             throw new ResultException(ResponseEnum.SHIPPING_NOT_EXIST.getDesc());
         }
