@@ -60,7 +60,7 @@ public class CategotyService {
     }
 
     private List<CategoryVo> classify(List<Category> categoryInDbs, List<CategoryVo> categoryVoList) {
-        categoryVoList.sort(Comparator.comparing(CategoryVo::getSortOrder));
+        categoryVoList.sort(Comparator.comparing(CategoryVo::getSortOrder).reversed());
         categoryVoList.forEach(categoryVo -> {
             List<CategoryVo> categoryVoListItem = new ArrayList<>();
             categoryInDbs.removeIf(category -> removeAndReturnData(categoryVoListItem, category, categoryVo.getId()));

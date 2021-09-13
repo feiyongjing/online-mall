@@ -31,8 +31,6 @@ public class CartService {
     @Autowired
     ProductService productService;
 
-    @Autowired
-    ProductMapper productMapper;
 
     public CartVo getCartProductList(Integer userId) {
         Map<Integer, Cart> entries = getProductAndCartMap(userId);
@@ -103,7 +101,7 @@ public class CartService {
         if (productDetailVo == null) {
             throw new ResultException(ResponseEnum.PRODUCT_NOT_EXIST.getDesc());
         }
-        if (productDetailVo.getStatus().equals(ProductStatusEnum.ON_SALE.getCode())) {
+        if (!productDetailVo.getStatus().equals(ProductStatusEnum.ON_SALE.getCode())) {
             throw new ResultException(ResponseEnum.PRODUCT_OFF_SALE_OR_DELETE.getDesc());
         }
         if (productDetailVo.getStock() <= 0) {

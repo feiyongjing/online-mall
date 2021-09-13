@@ -21,10 +21,10 @@ import static java.math.BigDecimal.ROUND_HALF_UP;
 
 @Transactional
 class ProductServiceTest extends AbstractUnitTest{
-    private static final Map<Integer, Product> PRODUCT_ID_AND_PRODUCT;
-    private static Integer CATEGORY_ID = 100002;
-    private static Integer PAGE_NUM = 1;
-    private static Integer PAGE_SIZE = 10;
+    public static final Map<Integer, Product> PRODUCT_ID_AND_PRODUCT;
+    public static Integer CATEGORY_ID = 100002;
+    public static Integer PAGE_NUM = 1;
+    public static Integer PAGE_SIZE = 10;
 
     static {
         PRODUCT_ID_AND_PRODUCT = new HashMap<>();

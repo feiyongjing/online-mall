@@ -24,4 +24,12 @@ public class CategoryVo {
     public CategoryVo(Integer id) {
         this.id = id;
     }
+
+    public CategoryVo(Integer id, Integer parentId, String name, Boolean status, Integer sortOrder) {
+        this.id = id;
+        this.parentId = parentId;
+        this.name = name;
+        this.status = status;
+        this.sortOrder = sortOrder;
+    }
 }
