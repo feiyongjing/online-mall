@@ -19,6 +19,9 @@ public class OrderItemService {
     @Autowired
     MyOrderItemMapper myOrderItemMapper;
 
+    public int insertOrderItemList(List<OrderItem> orderItemList) {
+        return myOrderItemMapper.insertOrderItemList(orderItemList);
+    }
 
     public List<OrderItem> getOrderItemListByOrderNos(List<Long> orderNos) {
         OrderItemExample orderItemExample=new OrderItemExample();
@@ -26,9 +29,7 @@ public class OrderItemService {
         return orderItemMapper.selectByExample(orderItemExample);
     }
 
-    public int insertOrderItemList(List<OrderItem> orderItemList) {
-        return myOrderItemMapper.insertOrderItemList(orderItemList);
-    }
+
 
     public List<OrderItem> getOrderItemListByOrderNo(Long orderNo) {
         OrderItemExample orderItemExample=new OrderItemExample();

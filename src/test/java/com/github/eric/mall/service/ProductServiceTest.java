@@ -62,23 +62,20 @@ class ProductServiceTest extends AbstractUnitTest{
         List<Integer> productIdList = new ArrayList<>(PRODUCT_ID_AND_PRODUCT.keySet());
         List<Product> productList = new ArrayList<>(PRODUCT_ID_AND_PRODUCT.values());
         Map<Integer, Product> productIdAndProduct = productService.findByIdIn(productIdList);
+        List<Product> productInDbList = new ArrayList<>(productIdAndProduct.values());
         Assertions.assertEquals(productIdList, new ArrayList<>(productIdAndProduct.keySet()));
-        verifyData(productList, productIdAndProduct, Product::getId);
-        verifyData(productList, productIdAndProduct, Product::getCategoryId);
-        verifyData(productList, productIdAndProduct, Product::getName);
-        verifyData(productList, productIdAndProduct, Product::getSubtitle);
-        verifyData(productList, productIdAndProduct, Product::getMainImage);
-        verifyData(productList, productIdAndProduct, Product::getSubImages);
-        verifyData(productList, productIdAndProduct, Product::getDetail);
-        verifyData(productList, productIdAndProduct, product -> product.getPrice().setScale(2,ROUND_HALF_UP));
-        verifyData(productList, productIdAndProduct, Product::getStock);
-        verifyData(productList, productIdAndProduct, Product::getStatus);
+        verifyData(productList, productInDbList, Product::getId);
+        verifyData(productList, productInDbList, Product::getCategoryId);
+        verifyData(productList, productInDbList, Product::getName);
+        verifyData(productList, productInDbList, Product::getSubtitle);
+        verifyData(productList, productInDbList, Product::getMainImage);
+        verifyData(productList, productInDbList, Product::getSubImages);
+        verifyData(productList, productInDbList, Product::getDetail);
+        verifyData(productList, productInDbList, product -> product.getPrice().setScale(2,ROUND_HALF_UP));
+        verifyData(productList, productInDbList, Product::getStock);
+        verifyData(productList, productInDbList, Product::getStatus);
     }
 
-    public void verifyData(List<Product> productIdList, Map<Integer, Product> productIdAndProduct, Function<? super Product, ?> function) {
-        Assertions.assertEquals(productIdList.stream().map(function).collect(Collectors.toList()),
-                productIdAndProduct.values().stream().map(function).collect(Collectors.toList()));
-    }
 
     @Test
     public void getProductByCategoryId() {

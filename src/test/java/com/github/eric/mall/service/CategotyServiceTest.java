@@ -75,11 +75,6 @@ class CategotyServiceTest extends AbstractUnitTest {
 
     }
 
-    private void verifyData(List<CategoryVo> categoryVoList, List<CategoryVo> categoryVoInDbList, Function<? super CategoryVo, ?> mapper) {
-        assertEquals(categoryVoList.stream().map(mapper).collect(Collectors.toList()),
-                categoryVoInDbList.stream().map(mapper).collect(Collectors.toList()));
-    }
-
 
     private List<CategoryVo> getNextLevelList(List<CategoryVo> root) {
         return root.stream()

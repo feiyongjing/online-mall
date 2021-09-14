@@ -65,7 +65,6 @@ public class ProductService {
 
         PageInfo pageInfo = new PageInfo<>(products);
         pageInfo.setList(productVos);
-//        PageInfo<ProductVo> pageInfo=new PageInfo<>(productVos);
         return pageInfo;
 
     }

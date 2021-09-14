@@ -7,11 +7,14 @@ import com.github.eric.mall.generate.entity.Product;
 import com.github.eric.mall.vo.CartProductVo;
 import com.github.eric.mall.vo.CartVo;
 import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -30,6 +33,9 @@ class CartServiceTest extends AbstractUnitTest {
 
     @Autowired
     CartService cartService;
+
+    @Autowired
+    RedisTemplate redisTemplate;
 
     @Test
     void getCartProductList() {
@@ -56,11 +62,6 @@ class CartServiceTest extends AbstractUnitTest {
         verifyData(cartProductVoList,cartProductVoListInDb,CartProductVo::getProductSelected);
     }
 
-    public void verifyData(List<CartProductVo> cartProductVoList, List<CartProductVo> cartProductVoListInDb, Function<? super CartProductVo, ?> function) {
-        Assertions.assertEquals(cartProductVoList.stream().map(function).collect(Collectors.toList()),
-                cartProductVoListInDb.stream().map(function).collect(Collectors.toList()));
-    }
-
     @Test
     void getProductAndCartMap() {
         Map<Integer, Cart> productIdAndCartMap = cartService.getProductAndCartMap(2);
@@ -73,7 +74,7 @@ class CartServiceTest extends AbstractUnitTest {
 
     // TODO 事务问题未解决
     @BeforeEach
-    void addCartProduct() {
+    public void addCartProduct() {
         List<CartProductVo> cartProductVoList = new ArrayList<>();
         CartProductVo cartProductVo_1 = new CartProductVo(28, 1, "4+64G送手环/Huawei/华为 nova 手机P9/P10plus青春", "NOVA青春版1999元", "http://img.springboot.cn/0093f5d3-bdb4-4fb0-bec5-5465dfd26363.jpeg", BigDecimal.valueOf(1999.00), 1, BigDecimal.valueOf(1999.00), 100, true);
         CartProductVo cartProductVo_2 = new CartProductVo(26, 1, "Apple iPhone 7 Plus (A1661) 128G 玫瑰金色 移动联通电信4G手机", "iPhone 7，现更以红色呈现。", "http://img.springboot.cn/241997c4-9e62-4824-b7f0-7425c3c28917.jpeg", BigDecimal.valueOf(6999.00), 1, BigDecimal.valueOf(6999.00), 96, true);
@@ -96,6 +97,12 @@ class CartServiceTest extends AbstractUnitTest {
         verifyData(cartProductVoList,cartProductVoListInDb, cartProductVo -> cartProductVo.getProductTotalPrice().setScale(2, ROUND_HALF_UP));
         verifyData(cartProductVoList,cartProductVoListInDb,CartProductVo::getProductStock);
         verifyData(cartProductVoList,cartProductVoListInDb,CartProductVo::getProductSelected);
+    }
+
+    @AfterEach
+    void clearRedisData(){
+        HashOperations<String, Integer, Cart> hashOperations = redisTemplate.opsForHash();
+        redisTemplate.delete(String.format(CartService.CART_REDIS_KEY_TEMPLATE, 2));
     }
 
     @Test

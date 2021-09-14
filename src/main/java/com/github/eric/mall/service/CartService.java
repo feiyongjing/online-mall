@@ -144,7 +144,6 @@ public class CartService {
         HashOperations<String, Integer, Cart> hashOperations = redisTemplate.opsForHash();
         Map<Integer, Cart> entries = hashOperations.entries(String.format(CART_REDIS_KEY_TEMPLATE, userId));
 
-        //TODO 只有商品状态正常的商品选中
         for (Map.Entry<Integer, Cart> entrie : entries.entrySet()) {
             entrie.getValue().setProductSelected(selectAll);
         }

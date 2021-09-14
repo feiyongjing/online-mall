@@ -110,13 +110,13 @@ public class OrderService {
             throw new ResultException("订单商品列表为空");
         }
     }
-    public void checkDatabaseUpdateOperations(int row, String msg){
+    private void checkDatabaseUpdateOperations(int row, String msg){
         if (row <= 0) {
             throw new ResultException(msg);
         }
     }
 
-    public void addOrderAndOrderItem(Order order, List<OrderItem> orderItemList, List<Product> productList, Integer userId, OrderAddForm orderAddForm) {
+    private void addOrderAndOrderItem(Order order, List<OrderItem> orderItemList, List<Product> productList, Integer userId, OrderAddForm orderAddForm) {
         checkDatabaseUpdateOperations(orderMapper.insertSelective(order),"下单失败");
         checkDatabaseUpdateOperations(orderItemService.insertOrderItemList(orderItemList),"下单失败");
         checkDatabaseUpdateOperations(productService.batchUpdateByPrimaryKeys(productList),"下单失败");
@@ -127,7 +127,7 @@ public class OrderService {
         }
     }
 
-    private OrderVo getOrderVo(Order order, List<OrderItem> orderItemList, Shipping shipping) {
+    public OrderVo getOrderVo(Order order, List<OrderItem> orderItemList, Shipping shipping) {
         OrderVo orderVo = new OrderVo();
         BeanUtils.copyProperties(order, orderVo);
 
@@ -146,7 +146,7 @@ public class OrderService {
         return orderVo;
     }
 
-    private Order buildOrder(Integer userId, Long orderNo, Integer shippingId, List<OrderItem> orderItemList) {
+    public Order buildOrder(Integer userId, Long orderNo, Integer shippingId, List<OrderItem> orderItemList) {
         Order order = new Order();
         order.setOrderNo(orderNo);
         order.setUserId(userId);
@@ -160,7 +160,7 @@ public class OrderService {
 
 
     // TODO 优化成分布式唯一id的生成
-    private Long generateOrderNo() {
+    public static Long generateOrderNo() {
         return System.currentTimeMillis() + new Random().nextInt(999);
     }
 

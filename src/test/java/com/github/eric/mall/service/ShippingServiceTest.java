@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Transactional
 class ShippingServiceTest extends AbstractUnitTest {
 
+    public static Shipping shipping = buildShipping();
     @Autowired
     ShippingService shippingService;
 
@@ -51,19 +52,7 @@ class ShippingServiceTest extends AbstractUnitTest {
     }
 
     @Test
-    void getShippingByIdAndUserId() {
-        Shipping shipping=new Shipping();
-        shipping.setId(5);
-        shipping.setUserId(2);
-        shipping.setReceiverName("aaa");
-        shipping.setReceiverPhone("039");
-        shipping.setReceiverMobile("12453333333");
-        shipping.setReceiverProvince("xx省");
-        shipping.setReceiverCity("xx市");
-        shipping.setReceiverDistrict("xx区");
-        shipping.setReceiverAddress("xxx");
-        shipping.setReceiverZip("111111");
-
+    void getShippingByIdAndUserId(){
         Shipping shippingInDb = shippingService.getShippingByIdAndUserId(5, 2);
 
         assertEquals(shipping.getId(),shippingInDb.getId());
@@ -77,6 +66,21 @@ class ShippingServiceTest extends AbstractUnitTest {
         assertEquals(shipping.getReceiverAddress(),shippingInDb.getReceiverAddress());
         assertEquals(shipping.getReceiverZip(),shippingInDb.getReceiverZip());
 
+    }
+
+    private static Shipping buildShipping() {
+        Shipping shipping=new Shipping();
+        shipping.setId(5);
+        shipping.setUserId(2);
+        shipping.setReceiverName("aaa");
+        shipping.setReceiverPhone("039");
+        shipping.setReceiverMobile("12453333333");
+        shipping.setReceiverProvince("xx省");
+        shipping.setReceiverCity("xx市");
+        shipping.setReceiverDistrict("xx区");
+        shipping.setReceiverAddress("xxx");
+        shipping.setReceiverZip("111111");
+        return shipping;
     }
 
     @Test
