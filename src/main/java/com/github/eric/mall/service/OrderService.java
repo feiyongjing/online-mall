@@ -68,26 +68,30 @@ public class OrderService {
         return getOrderVo(order, orderItemList, shipping);
     }
 
-    private void checkOrderProduct(OrderAddForm orderAddForm, Integer userId, Long orderNo, List<OrderItem> orderItemList, Map<Integer, Product> productIdAndProductMap) {
+    public void checkOrderProduct(OrderAddForm orderAddForm, Integer userId, Long orderNo, List<OrderItem> orderItemList, Map<Integer, Product> productIdAndProductMap) {
         for (Map.Entry<Integer, Integer> productIdAndNumber : orderAddForm.getProductIdAndNumberMap().entrySet()) {
             Integer productId = productIdAndNumber.getKey();
             Integer number = productIdAndNumber.getValue();
             Product product = productIdAndProductMap.get(productId);
-            // 商品是否存在
-            if (!productIdAndProductMap.containsKey(productId)) {
-                throw new ResultException(ResponseEnum.PRODUCT_NOT_EXIST.getDesc());
-            }
-            // 商品是否在售
-            if (!product.getStatus().equals(ProductStatusEnum.ON_SALE.getCode())) {
-                throw new ResultException(ResponseEnum.PRODUCT_OFF_SALE_OR_DELETE.getDesc());
-            }
-            // 库存是否充足
-            if (product.getStock() < number) {
-                throw new ResultException(ResponseEnum.PRODUCT_STOCK_ERROR.getDesc());
-            }
+            checkProductInfo(productIdAndProductMap, productId, number, product);
             orderItemList.add(buildOrderItem(userId, orderNo, number, product));
             // 对商品信息的库存减少
             product.setStock(product.getStock() - number);
+        }
+    }
+
+    public void checkProductInfo(Map<Integer, Product> productIdAndProductMap, Integer productId, Integer number, Product product) {
+        // 商品是否存在
+        if (!productIdAndProductMap.containsKey(productId)) {
+            throw new ResultException(ResponseEnum.PRODUCT_NOT_EXIST.getDesc());
+        }
+        // 商品是否在售
+        if (!product.getStatus().equals(ProductStatusEnum.ON_SALE.getCode())) {
+            throw new ResultException(ResponseEnum.PRODUCT_OFF_SALE_OR_DELETE.getDesc());
+        }
+        // 库存是否充足
+        if (product.getStock() < number) {
+            throw new ResultException(ResponseEnum.PRODUCT_STOCK_ERROR.getDesc());
         }
     }
 

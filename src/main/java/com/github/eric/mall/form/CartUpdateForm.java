@@ -12,4 +12,7 @@ public class CartUpdateForm {
         this.quantity = quantity;
         this.selected = selected;
     }
+
+    public CartUpdateForm() {
+    }
 }

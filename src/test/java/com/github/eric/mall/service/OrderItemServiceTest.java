@@ -51,7 +51,7 @@ class OrderItemServiceTest extends AbstractUnitTest {
         assertEquals(2, row);
     }
 
-    private static OrderItem buildOrderItem(Integer userId, Long orderNo, Integer productId, String productName, String productImage, BigDecimal currentUnitPrice, Integer quantity, BigDecimal totalPrice) {
+    public static OrderItem buildOrderItem(Integer userId, Long orderNo, Integer productId, String productName, String productImage, BigDecimal currentUnitPrice, Integer quantity, BigDecimal totalPrice) {
         OrderItem orderItem = new OrderItem();
         orderItem.setUserId(userId);
         orderItem.setOrderNo(orderNo);

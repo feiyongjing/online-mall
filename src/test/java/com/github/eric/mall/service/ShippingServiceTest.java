@@ -1,6 +1,7 @@
 package com.github.eric.mall.service;
 
 import com.github.eric.mall.enums.ResponseEnum;
+import com.github.eric.mall.exception.ResultException;
 import com.github.eric.mall.form.ShippingForm;
 import com.github.eric.mall.generate.entity.Shipping;
 import com.github.eric.mall.vo.ResponseVo;
@@ -31,6 +32,26 @@ class ShippingServiceTest extends AbstractUnitTest {
                 "详细地址1","邮编1");
         ResponseVo<ShippingVo> responseVo = shippingService.addShipping(shippingForm, 2);
         assertEquals(ResponseEnum.SUCCESS.getCode(),responseVo.getStatus());
+    }
+
+    @Test
+    public void checkDatabaseUpdateOperations(){
+        verifyException(ResultException.class,ResponseEnum.INSERT_SHIPPING_FAIL.getDesc()
+                ,() -> shippingService.checkDatabaseUpdateOperations(0,ResponseEnum.INSERT_SHIPPING_FAIL.getDesc()));
+        verifyException(ResultException.class,ResponseEnum.DELETE_SHIPPING_FAIL.getDesc()
+                ,() -> shippingService.checkDatabaseUpdateOperations(0,ResponseEnum.DELETE_SHIPPING_FAIL.getDesc()));
+    }
+
+    @Test
+    void getShippingByIdAndUserIdFailure(){
+        verifyException(ResultException.class,ResponseEnum.SHIPPING_NOT_EXIST.getDesc()
+                ,() -> shippingService.getShippingByIdAndUserId(5,1));
+    }
+
+    @Test
+    void getShippingListByIdsAndUserFailure(){
+        verifyException(ResultException.class,ResponseEnum.SHIPPING_NOT_EXIST.getDesc()
+                ,() -> shippingService.getShippingListByIdsAndUser(Arrays.asList(4,5),3));
     }
 
 
@@ -67,6 +88,7 @@ class ShippingServiceTest extends AbstractUnitTest {
         assertEquals(shipping.getReceiverZip(),shippingInDb.getReceiverZip());
 
     }
+
 
     private static Shipping buildShipping() {
         Shipping shipping=new Shipping();

@@ -46,6 +46,12 @@ public enum ResponseEnum {
     UPDATE_SHIPPING_SUCCESS(23, "修改收货地址成功"),
 
     UPDATE_SHIPPING_FAIL(24, "修改收货地址失败"),
+
+    INSERT_SHIPPING_FAIL(25, "新建地址失败"),
+
+    USER_REGISTER_FAIL(26,"注册失败"),
+
+    USER_REGISTER_SUCCESS(27,"注册成功"),
     ;
 
     Integer code;

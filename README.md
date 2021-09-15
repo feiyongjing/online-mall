@@ -9,7 +9,7 @@ redis docker服务启动
 docker run --name mall-redis -p 6379:6379 -d redis
 
 rabbitmq docker服务启动
-docker run -d -p 15672:15672 -p 5672:5672 -e RABBITMQ_DEFAULT_USER=admin -e RABBITMQ_DEFAULT_PASS=admin --name rabbitmq rabbitmq:3.9.5-management
+docker run --name rabbitmq -d -p 15672:15672 -p 5672:5672 -e RABBITMQ_DEFAULT_USER=admin -e RABBITMQ_DEFAULT_PASS=admin rabbitmq:3.9.5-management
 
 测试环境
 mysql docker服务启动
@@ -19,5 +19,5 @@ redis docker服务启动
 docker run --name mall-redis-test -p 6380:6379 -d redis
 
 rabbitmq docker服务启动
-docker run --name mall-rabbitmq-test -d -p 15672:15672 -p 5673:5672 -e RABBITMQ_DEFAULT_USER=admin -e RABBITMQ_DEFAULT_PASS=admin rabbitmq:3.9.5-management
+docker run --name mall-rabbitmq-test -d -p 15673:15672 -p 5673:5672 -e RABBITMQ_DEFAULT_USER=admin -e RABBITMQ_DEFAULT_PASS=admin rabbitmq:3.9.5-management
 

@@ -8,7 +8,7 @@
     <update id="updateOrderStatusByOrderNo" parameterType="Map">
         update mall_order
         set status = #{status}
-        where orderNo = #{orderNo}
+        where order_no = #{orderNo}
     </update>
     <select id="getByOrderNo" resultType="com.github.eric.mall.generate.entity.Order">
         select

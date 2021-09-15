@@ -5,6 +5,7 @@ import com.github.eric.mall.vo.CartProductVo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
@@ -44,5 +45,10 @@ public abstract class AbstractUnitTest {
         Assertions.assertEquals(fields.size(),inDbFields.size());
         fields.removeAll(inDbFields);
         Assertions.assertEquals(0,fields.size());
+    }
+
+    public <T extends Throwable> void verifyException(Class<T> exceptionClass, String msg, Executable executable) {
+        T resultException = Assertions.assertThrows(exceptionClass, executable);
+        Assertions.assertEquals(msg,resultException.getMessage());
     }
 }

@@ -25,7 +25,7 @@ public class UserController {
 
     @PostMapping("/register")
     @ResponseBody
-    public ResponseVo<User> register(@Valid @RequestBody UserForm userForm){
+    public ResponseVo<String> register(@Valid @RequestBody UserForm userForm){
         return userService.register(userForm);
     }
 

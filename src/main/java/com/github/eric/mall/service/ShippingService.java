@@ -32,7 +32,7 @@ public class ShippingService {
         BeanUtils.copyProperties(shippingForm, shipping);
         shipping.setUserId(userId);
 
-        checkDatabaseUpdateOperations(shippingMapper.insertSelective(shipping),"新建地址失败");
+        checkDatabaseUpdateOperations(shippingMapper.insertSelective(shipping),ResponseEnum.INSERT_SHIPPING_FAIL.getDesc());
         return ResponseVo.success(new ShippingVo(shipping.getId()));
     }
 

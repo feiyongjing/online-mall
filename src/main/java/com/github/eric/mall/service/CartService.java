@@ -33,13 +33,15 @@ public class CartService {
 
 
     public CartVo getCartProductList(Integer userId) {
+        Map<Integer, Product> productMap;
         Map<Integer, Cart> entries = getProductAndCartMap(userId);
-        if(entries.isEmpty()){
-            return getCartVo(entries, new HashMap<>());
-        }
-        Set<Integer> productIds = entries.keySet();
-        Map<Integer, Product> productMap = productService.findByIdIn(new ArrayList<>(productIds));
 
+        if (entries.isEmpty()) {
+            productMap = new HashMap<>();
+        } else {
+            Set<Integer> productIds = entries.keySet();
+            productMap = productService.findByIdIn(new ArrayList<>(productIds));
+        }
         return getCartVo(entries, productMap);
     }
 
@@ -97,7 +99,7 @@ public class CartService {
         return getCartProductList(userId);
     }
 
-    private void checkProduct(ProductDetailVo productDetailVo) {
+    public void checkProduct(ProductDetailVo productDetailVo) {
         if (productDetailVo == null) {
             throw new ResultException(ResponseEnum.PRODUCT_NOT_EXIST.getDesc());
         }
@@ -114,8 +116,7 @@ public class CartService {
         Cart cart = hashOperations.get(String.format(CART_REDIS_KEY_TEMPLATE, userId), productId);
         if (cart == null) {
             // 购物车中没有对应的商品
-            ResponseVo.error(ResponseEnum.CART_PRODUCT_NOT_EXIST);
-            throw new RuntimeException();
+            throw new ResultException(ResponseEnum.CART_PRODUCT_NOT_EXIST.getDesc());
         } else {
             if (cartUpdateForm.getQuantity() != null && cartUpdateForm.getQuantity() >= 0) {
                 cart.setQuantity(cartUpdateForm.getQuantity());
@@ -140,22 +141,22 @@ public class CartService {
         return getCartProductList(userId);
     }
 
-    public CartVo isSelectAllCartProduct(Integer userId,Boolean selectAll) {
+    public CartVo isSelectAllCartProduct(Integer userId, Boolean selectAll) {
         HashOperations<String, Integer, Cart> hashOperations = redisTemplate.opsForHash();
         Map<Integer, Cart> entries = hashOperations.entries(String.format(CART_REDIS_KEY_TEMPLATE, userId));
 
         for (Map.Entry<Integer, Cart> entrie : entries.entrySet()) {
             entrie.getValue().setProductSelected(selectAll);
         }
-        hashOperations.putAll(String.format(CART_REDIS_KEY_TEMPLATE, userId),entries);
+        hashOperations.putAll(String.format(CART_REDIS_KEY_TEMPLATE, userId), entries);
         return getCartProductList(userId);
     }
 
     public Integer getCartProductSum(Integer userId) {
         Map<Integer, Cart> entries = getProductAndCartMap(userId);
-        Integer result=0;
+        Integer result = 0;
         for (Map.Entry<Integer, Cart> entrie : entries.entrySet()) {
-            result+= entrie.getValue().getQuantity();
+            result += entrie.getValue().getQuantity();
         }
 
         return result;
