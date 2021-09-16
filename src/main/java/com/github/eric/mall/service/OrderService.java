@@ -108,22 +108,23 @@ public class OrderService {
         }
     }
 
-    private void checkOrderProductList(Map<Integer, Integer> productIdAndNumberMap) {
+    public void checkOrderProductList(Map<Integer, Integer> productIdAndNumberMap) {
         if (productIdAndNumberMap.isEmpty()) {
             // 直接下订单没传递商品列表或购物车中没有选中的商品
-            throw new ResultException("订单商品列表为空");
+            throw new ResultException(ResponseEnum.ORDER_PRODUCT_NOT_EXIST.getDesc());
         }
     }
-    private void checkDatabaseUpdateOperations(int row, String msg){
+
+    public void checkDatabaseUpdateOperations(int row, String msg) {
         if (row <= 0) {
             throw new ResultException(msg);
         }
     }
 
     private void addOrderAndOrderItem(Order order, List<OrderItem> orderItemList, List<Product> productList, Integer userId, OrderAddForm orderAddForm) {
-        checkDatabaseUpdateOperations(orderMapper.insertSelective(order),"下单失败");
-        checkDatabaseUpdateOperations(orderItemService.insertOrderItemList(orderItemList),"下单失败");
-        checkDatabaseUpdateOperations(productService.batchUpdateByPrimaryKeys(productList),"下单失败");
+        checkDatabaseUpdateOperations(orderMapper.insertSelective(order), ResponseEnum.ADD_ORDER_FAIL.getDesc());
+        checkDatabaseUpdateOperations(orderItemService.insertOrderItemList(orderItemList), ResponseEnum.ADD_ORDER_FAIL.getDesc());
+        checkDatabaseUpdateOperations(productService.batchUpdateByPrimaryKeys(productList), ResponseEnum.ADD_ORDER_FAIL.getDesc());
 
         if (orderAddForm.getOrderWay().equals(OrderWayEnum.CART_ORDER.getCode())) {
             HashOperations<String, Integer, Cart> hashOperations = redisTemplate.opsForHash();
@@ -205,7 +206,7 @@ public class OrderService {
                 throw new RuntimeException();
             }
             if (!shippingIdAndShippingMap.containsKey(order.getShippingId())) {
-                // 数据库数据出差
+                // 数据库数据出错
                 throw new RuntimeException();
             }
             OrderVo orderVo = getOrderVo(order, orderNoAndOrderItemMap.get(order.getOrderNo()), shippingIdAndShippingMap.get(order.getShippingId()));
@@ -220,40 +221,41 @@ public class OrderService {
 
     public OrderVo getOrderByOrderNo(Long orderNo, Integer userId) {
         Order order = myOrderMapper.getByOrderNo(orderNo);
-        if (order == null || !order.getUserId().equals(userId)) {
-            throw new ResultException("订单不存在");
-        }
+        checkOrderUserId(userId, order);
         List<OrderItem> orderItemList = orderItemService.getOrderItemListByOrderNo(orderNo);
         Shipping shipping = shippingService.getShippingByIdAndUserId(order.getShippingId(), userId);
         return getOrderVo(order, orderItemList, shipping);
     }
 
+    public void checkOrderUserId(Integer userId, Order order) {
+        if (order == null || !order.getUserId().equals(userId)) {
+            throw new ResultException(ResponseEnum.ORDER_NOT_EXIST.getDesc());
+        }
+    }
+
 
     public void deleteOrderByOrderNo(Long orderNo, Integer userId) {
         Order order = myOrderMapper.getByOrderNo(orderNo);
-        if (order == null || !order.getUserId().equals(userId)) {
-            throw new ResultException("订单不存在");
-        }
+        checkOrderUserId(userId, order);
 
-        if (Objects.equals(order.getStatus(), OrderStatusEnum.PAID.getCode())) {
-            throw new ResultException("此订单已付款，无法被取消");
-        }
+        checkOrderStatusIsPay(order.getStatus());
         if (Objects.equals(order.getStatus(), OrderStatusEnum.NO_PAY.getCode())) {
             // 此订单未付款，可以取消
             order.setStatus(OrderStatusEnum.CANCELED.getCode());
             order.setCloseTime(new Date());
             int row = orderMapper.updateByPrimaryKeySelective(order);
-            if(row<=0){
-                // 此订单取消失败
-                throw new ResultException("此订单取消失败");
-            }
+            checkDatabaseUpdateOperations(row, ResponseEnum.CANCEL_ORDER_FAIL.getDesc());
+        }
+    }
+
+    public void checkOrderStatusIsPay(Integer status) {
+        if (Objects.equals(status, OrderStatusEnum.PAID.getCode())) {
+            throw new ResultException(ResponseEnum.ORDER_FOR_PAY_CANCEL_FAIL.getDesc());
         }
     }
 
     public void updateOrderStatusByOrderNo(Long orderNo) {
-        int row=myOrderMapper.updateOrderStatusByOrderNo(orderNo, OrderStatusEnum.PAID.getCode());
-        if(row<=0){
-            throw new ResultException("订单错误");
-        }
+        int row = myOrderMapper.updateOrderStatusByOrderNo(orderNo, OrderStatusEnum.PAID.getCode());
+        checkDatabaseUpdateOperations(row, ResponseEnum.UPDATE_ORDER_STATUS_FAIL.getDesc());
     }
 }

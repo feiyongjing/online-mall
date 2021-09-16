@@ -12,6 +12,13 @@ spring:
     port: 5672
     username: admin
     password: admin
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    listener:
+      simple:
+        acknowledge-mode: manual
+        retry:
+          enabled: true
 
 mybatis:
   config-location: classpath:db/mybatis/config.xml

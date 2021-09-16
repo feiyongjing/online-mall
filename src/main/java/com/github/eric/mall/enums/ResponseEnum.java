@@ -9,7 +9,7 @@ public enum ResponseEnum {
 
     SUCCESS(0, "成功"),
 
-    PASSWORD_ERROR(1,"密码错误"),
+    PASSWORD_ERROR(1, "密码错误"),
 
     USERNAME_EXIST(2, "用户名已存在"),
 
@@ -39,7 +39,7 @@ public enum ResponseEnum {
 
     ORDER_STATUS_ERROR(20, "订单状态有误"),
 
-    PRODUCT_UNDER_STOCK(21,"商品库存不足"),
+    PRODUCT_UNDER_STOCK(21, "商品库存不足"),
 
     DELETE_SHIPPING_SUCCESS(22, "删除收货地址成功"),
 
@@ -49,9 +49,20 @@ public enum ResponseEnum {
 
     INSERT_SHIPPING_FAIL(25, "新建地址失败"),
 
-    USER_REGISTER_FAIL(26,"注册失败"),
+    USER_REGISTER_FAIL(26, "注册失败"),
 
-    USER_REGISTER_SUCCESS(27,"注册成功"),
+    USER_REGISTER_SUCCESS(27, "注册成功"),
+
+    ORDER_PRODUCT_NOT_EXIST(27, "订单商品列表为空"),
+
+    ADD_ORDER_FAIL(28, "下订单失败"),
+
+    ORDER_FOR_PAY_CANCEL_FAIL(29, "此订单已付款，无法被取消"),
+
+    CANCEL_ORDER_FAIL(29, "此订单取消失败"),
+
+    UPDATE_ORDER_STATUS_FAIL(30,"修改订单支付状态失败"),
+
     ;
 
     Integer code;

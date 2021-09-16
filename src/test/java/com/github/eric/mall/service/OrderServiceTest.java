@@ -1,5 +1,6 @@
 package com.github.eric.mall.service;
 
+import com.github.eric.mall.enums.OrderStatusEnum;
 import com.github.eric.mall.enums.OrderWayEnum;
 import com.github.eric.mall.enums.ProductStatusEnum;
 import com.github.eric.mall.enums.ResponseEnum;
@@ -41,14 +42,13 @@ class OrderServiceTest extends AbstractUnitTest {
     RedisTemplate redisTemplate;
 
     @BeforeEach
-    public void setData() {
+    public void setCartData() {
         cartService.addCartProduct(new CartAddForm(26, true), 2);
-        CartVo cartVo = cartService.addCartProduct(new CartAddForm(29, true), 2);
+        cartService.addCartProduct(new CartAddForm(29, true), 2);
     }
 
     @AfterEach
     void clearRedisData() {
-        HashOperations<String, Integer, Cart> hashOperations = redisTemplate.opsForHash();
         redisTemplate.delete(String.format(CartService.CART_REDIS_KEY_TEMPLATE, 2));
     }
 
@@ -132,13 +132,28 @@ class OrderServiceTest extends AbstractUnitTest {
     }
 
     @Test
-    void getOrderByOrderNo() {
+    void getOrderByOrderNoSuccess() {
         OrderItem orderItem_1 = OrderItemServiceTest.buildOrderItem(2, ORDER_NO, 26, "Apple iPhone 7 Plus (A1661) 128G 玫瑰金色 移动联通电信4G手机", "http://img.springboot.cn/241997c4-9e62-4824-b7f0-7425c3c28917.jpeg", BigDecimal.valueOf(6999.00), 1, BigDecimal.valueOf(6999.00));
         OrderItem orderItem_2 = OrderItemServiceTest.buildOrderItem(2, ORDER_NO, 27, "Midea/美的 BCD-535WKZM(E)冰箱双开门对开门风冷无霜智能电家用", "http://img.springboot.cn/ac3e571d-13ce-4fad-89e8-c92c2eccf536.jpeg", BigDecimal.valueOf(3299.00), 1, BigDecimal.valueOf(3299.00));
         OrderVo orderVo_1 = buildOrderVo(orderItem_1, orderItem_2);
         OrderVo orderVoInDb = orderService.getOrderByOrderNo(ORDER_NO, 2);
         verifyOrderVo(orderVo_1, orderVoInDb);
+    }
 
+    @Test
+    void checkOrderUserId() {
+        Order order = new Order();
+        order.setUserId(2);
+        verifyException(ResultException.class, ResponseEnum.ORDER_NOT_EXIST.getDesc()
+                ,()-> orderService.checkOrderUserId(2,null));
+        verifyException(ResultException.class, ResponseEnum.ORDER_NOT_EXIST.getDesc()
+                ,()-> orderService.checkOrderUserId(1,order));
+    }
+
+    @Test
+    public void checkOrderStatusIsPay() {
+        verifyException(ResultException.class, ResponseEnum.ORDER_FOR_PAY_CANCEL_FAIL.getDesc()
+                ,()-> orderService.checkOrderStatusIsPay(OrderStatusEnum.PAID.getCode()));
     }
 
     @Test
@@ -176,6 +191,21 @@ class OrderServiceTest extends AbstractUnitTest {
     @Test
     void deleteOrderByOrderNo() {
         orderService.deleteOrderByOrderNo(ORDER_NO, 2);
+    }
+
+    @Test
+    public void checkOrderProductList() {
+        verifyException(ResultException.class,ResponseEnum.ORDER_PRODUCT_NOT_EXIST.getDesc()
+                , ()-> orderService.checkOrderProductList(new HashMap<>()));
+    }
+    @Test
+    public void checkDatabaseUpdateOperations() {
+        verifyException(ResultException.class,ResponseEnum.ADD_ORDER_FAIL.getDesc()
+                , ()-> orderService.checkDatabaseUpdateOperations(0,ResponseEnum.ADD_ORDER_FAIL.getDesc()));
+        verifyException(ResultException.class,ResponseEnum.CANCEL_ORDER_FAIL.getDesc()
+                , ()-> orderService.checkDatabaseUpdateOperations(0,ResponseEnum.CANCEL_ORDER_FAIL.getDesc()));
+        verifyException(ResultException.class,ResponseEnum.UPDATE_ORDER_STATUS_FAIL.getDesc()
+                , ()-> orderService.checkDatabaseUpdateOperations(0,ResponseEnum.UPDATE_ORDER_STATUS_FAIL.getDesc()));
     }
 
     @Test
