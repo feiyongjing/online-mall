@@ -1,6 +1,8 @@
 package com.github.eric.mall.config;
 
 import com.github.pagehelper.PageInterceptor;
+import org.springframework.amqp.core.*;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -44,6 +46,30 @@ public class InterceptorConfig implements WebMvcConfigurer {
         return redisTemplate;
     }
 
+
+    @Bean(name = "dirtctQueue")
+    public Queue dirtctQueue() {
+        return new Queue("payNotify", true, false, false);
+    }
+
+    @Bean(name = "test-1")
+    public Queue queue() {
+        return new Queue("test1", true, false, false);
+    }
+
+
+    @Bean(name = "dirtctExchange")
+    public DirectExchange dirtctExchange() {
+        return new DirectExchange("dirtctExchange");
+    }
+
+    @Bean
+    public Binding confirmTestFanoutExchangeAndQueue(
+            @Qualifier("dirtctExchange") DirectExchange confirmTestExchange,
+            @Qualifier("dirtctQueue") Queue confirmTestQueue) {
+
+        return BindingBuilder.bind(confirmTestQueue).to(confirmTestExchange).with("payNotify");
+    }
 //    /**
 //     * description 配置事务管理器
 //     **/

@@ -12,13 +12,21 @@ spring:
     port: 5672
     username: admin
     password: admin
-    publisher-confirm-type: correlated
-    publisher-returns: true
     listener:
       simple:
         acknowledge-mode: manual
         retry:
           enabled: true
+
+#  # 发送者开启 confirm 确认机制
+#  spring.rabbitmq.publisher-confirms=true
+#  # 发送者开启 return 确认机制
+#  spring.rabbitmq.publisher-returns=true
+#  ####################################################
+#  # 设置消费端手动 ack
+#  spring.rabbitmq.listener.simple.acknowledge-mode=manual
+#  # 是否支持重试
+#  spring.rabbitmq.listener.simple.retry.enabled=true
 
 mybatis:
   config-location: classpath:db/mybatis/config.xml
