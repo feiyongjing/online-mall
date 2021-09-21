@@ -7,13 +7,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import javax.sql.DataSource;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
+
+import static com.github.eric.onlinemallpay.config.RabbitmqConfig.*;
 
 @Configuration
 public class InterceptorConfig implements WebMvcConfigurer {
@@ -45,31 +46,34 @@ public class InterceptorConfig implements WebMvcConfigurer {
 //        redisTemplate.setEnableTransactionSupport(true);
         return redisTemplate;
     }
-
-
-    @Bean(name = "dirtctQueue")
-    public Queue dirtctQueue() {
-        return new Queue("payNotify", true, false, false);
+    @Bean
+    DirectExchange exchange() {
+        return new DirectExchange(TEST_EXCHANGE_HAHA);
     }
 
-    @Bean(name = "test-1")
-    public Queue queue() {
-        return new Queue("test1", true, false, false);
+    @Bean(QUEUE_NAME_1)
+    public Queue queue1() {
+        Map<String,Object> map = new HashMap<>();
+        map.put("x-dead-letter-exchange",TEST_EXCHANGE_DEAD);
+        map.put("x-dead-letter-routing-key",TEST_ROUTING_KEY_DEAD);
+        return QueueBuilder.durable(QUEUE_NAME_1).withArguments(map).build();
     }
 
-
-    @Bean(name = "dirtctExchange")
-    public DirectExchange dirtctExchange() {
-        return new DirectExchange("dirtctExchange");
+    @Bean(QUEUE_NAME_2)
+    public Queue queue2() {
+        return QueueBuilder.durable(QUEUE_NAME_2).build();
     }
 
     @Bean
-    public Binding confirmTestFanoutExchangeAndQueue(
-            @Qualifier("dirtctExchange") DirectExchange confirmTestExchange,
-            @Qualifier("dirtctQueue") Queue confirmTestQueue) {
-
-        return BindingBuilder.bind(confirmTestQueue).to(confirmTestExchange).with("payNotify");
+    Binding bindingExchangeMessages(@Qualifier(QUEUE_NAME_1) Queue queue, DirectExchange exchange) {
+        return BindingBuilder.bind(queue).to(exchange).with(TEST_ROUTING_KEY_HAHA);
     }
+
+    @Bean
+    Binding bindingExchangeMessage(@Qualifier(QUEUE_NAME_2) Queue queue, DirectExchange exchange) {
+        return BindingBuilder.bind(queue).to(exchange).with(TEST_ROUTING_KEY_DEAD);
+    }
+
 //    /**
 //     * description 配置事务管理器
 //     **/

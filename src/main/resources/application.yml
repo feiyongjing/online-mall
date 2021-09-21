@@ -14,19 +14,13 @@ spring:
     password: admin
     listener:
       simple:
-        acknowledge-mode: manual
+        default-requeue-rejected: false #意思是，最后一次重试消费抛出异常后消息被拒（即未消费），是否重新放入队列
         retry:
-          enabled: true
+          enabled: true   # 是否支持消费消息失败重试
+          max-attempts: 3 # 消费消息失败重试的最大次数
+          initial-interval: 5000ms # 间隔5s后重试
 
-#  # 发送者开启 confirm 确认机制
-#  spring.rabbitmq.publisher-confirms=true
-#  # 发送者开启 return 确认机制
-#  spring.rabbitmq.publisher-returns=true
-#  ####################################################
-#  # 设置消费端手动 ack
-#  spring.rabbitmq.listener.simple.acknowledge-mode=manual
-#  # 是否支持重试
-#  spring.rabbitmq.listener.simple.retry.enabled=true
+
 
 mybatis:
   config-location: classpath:db/mybatis/config.xml
