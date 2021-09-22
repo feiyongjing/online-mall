@@ -51,26 +51,26 @@ public class InterceptorConfig implements WebMvcConfigurer {
         return new DirectExchange(TEST_EXCHANGE_HAHA);
     }
 
-    @Bean(QUEUE_NAME_1)
+    @Bean(PAY_NOTIFY_QUEUE)
     public Queue queue1() {
         Map<String,Object> map = new HashMap<>();
         map.put("x-dead-letter-exchange",TEST_EXCHANGE_DEAD);
         map.put("x-dead-letter-routing-key",TEST_ROUTING_KEY_DEAD);
-        return QueueBuilder.durable(QUEUE_NAME_1).withArguments(map).build();
+        return QueueBuilder.durable(PAY_NOTIFY_QUEUE).withArguments(map).build();
     }
 
-    @Bean(QUEUE_NAME_2)
+    @Bean(PAY_NOTIFY_DEAD_QUEUE)
     public Queue queue2() {
-        return QueueBuilder.durable(QUEUE_NAME_2).build();
+        return QueueBuilder.durable(PAY_NOTIFY_DEAD_QUEUE).build();
     }
 
     @Bean
-    Binding bindingExchangeMessages(@Qualifier(QUEUE_NAME_1) Queue queue, DirectExchange exchange) {
+    Binding bindingExchangeMessages(@Qualifier(PAY_NOTIFY_QUEUE) Queue queue, DirectExchange exchange) {
         return BindingBuilder.bind(queue).to(exchange).with(TEST_ROUTING_KEY_HAHA);
     }
 
     @Bean
-    Binding bindingExchangeMessage(@Qualifier(QUEUE_NAME_2) Queue queue, DirectExchange exchange) {
+    Binding bindingExchangeMessage(@Qualifier(PAY_NOTIFY_DEAD_QUEUE) Queue queue, DirectExchange exchange) {
         return BindingBuilder.bind(queue).to(exchange).with(TEST_ROUTING_KEY_DEAD);
     }
 
